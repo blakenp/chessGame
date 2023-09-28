@@ -12,9 +12,6 @@ public class ChessBoardImplementation implements ChessBoard {
         this.chessBoard = new ChessPiece[8][8];
     }
 
-    private ChessBoard getNewBoard(){
-        return new ChessBoardImplementation();
-    }
     @Override
     public void addPiece(ChessPosition position, ChessPiece piece) {
         chessBoard[position.getRow() - 1][position.getColumn() - 1] = piece;
