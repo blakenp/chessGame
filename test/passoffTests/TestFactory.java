@@ -1,9 +1,7 @@
 package passoffTests;
 
 import chess.*;
-import chessImplementation.ChessBoardImplementation;
-import chessImplementation.ChessPieceImplementation;
-import chessImplementation.ChessPositionImplementation;
+import chessImplementation.*;
 
 /**
  * Used for testing your code
@@ -14,7 +12,6 @@ public class TestFactory {
     //Chess Functions
     //------------------------------------------------------------------------------------------------------------------
     public static ChessBoard getNewBoard(){
-        ChessPiece[][] board = new ChessPiece[8][8];
         return new ChessBoardImplementation();
     }
 
@@ -24,7 +21,19 @@ public class TestFactory {
     }
 
     public static ChessPiece getNewPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type){
-        return new ChessPieceImplementation(pieceColor, type);
+        if (type == ChessPiece.PieceType.ROOK) {
+            return new Rook(pieceColor, type);
+        } else if (type == ChessPiece.PieceType.KNIGHT) {
+            return new Knight(pieceColor, type);
+        } else if (type == ChessPiece.PieceType.BISHOP) {
+            return new Bishop(pieceColor, type);
+        } else if (type == ChessPiece.PieceType.QUEEN) {
+            return new Queen(pieceColor, type);
+        } else if (type == ChessPiece.PieceType.KING) {
+            return new King(pieceColor, type);
+        } else {
+            return new Pawn(pieceColor, type);
+        }
     }
 
     public static ChessPosition getNewPosition(Integer row, Integer col){
@@ -32,8 +41,7 @@ public class TestFactory {
     }
 
     public static ChessMove getNewMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece){
-        // FIXME
-		return null;
+		return new ChessMoveImplementation(startPosition, endPosition, promotionPiece);
     }
     //------------------------------------------------------------------------------------------------------------------
 
