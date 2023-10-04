@@ -26,6 +26,6 @@ public class ChessPieceImplementation implements ChessPiece {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return null;
+        return validMoves;
     }
 }
