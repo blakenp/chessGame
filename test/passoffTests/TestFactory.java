@@ -11,13 +11,12 @@ public class TestFactory {
 
     //Chess Functions
     //------------------------------------------------------------------------------------------------------------------
-    public static ChessBoard getNewBoard(){
+    public static ChessBoard getNewBoard() {
         return new ChessBoardImplementation();
     }
 
-    public static ChessGame getNewGame(){
-        // FIXME
-		return null;
+    public static ChessGame getNewGame() {
+		return new ChessGameImplementation();
     }
 
     public static ChessPiece getNewPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type){

@@ -30,4 +30,11 @@ public interface ChessBoard {
      * (How the game of chess normally starts)
      */
     void resetBoard();
+
+    /**
+     *
+     * @param position
+     * Takes in the position of a piece and removes it from the game board
+     */
+    void removePiece(ChessPosition position);
 }
