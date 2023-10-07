@@ -1,9 +1,6 @@
 package chessImplementation;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -12,6 +9,10 @@ import java.util.Set;
 public class Queen extends ChessPieceImplementation {
     public Queen(ChessGame.TeamColor color, PieceType type) {
         super(color, type);
+    }
+
+    public Queen(ChessPiece originalPiece) {
+        super(originalPiece);
     }
 
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {

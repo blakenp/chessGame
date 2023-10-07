@@ -12,6 +12,23 @@ public class ChessBoardImplementation implements ChessBoard {
         this.chessBoard = new ChessPiece[8][8];
     }
 
+    // copy constructor
+    public ChessBoardImplementation(ChessBoard originalBoard) {
+        this.chessBoard = new ChessPiece[8][8];
+
+        for (var i = 1; i <= 8; i++) {
+            for (var j = 1; j <= 8; j++) {
+                ChessPosition chessPosition = new ChessPositionImplementation(i, j);
+                ChessPiece originalPiece = originalBoard.getPiece(chessPosition);
+
+                if (originalPiece != null) {
+                    ChessPiece deepCopiedPiece = translateToNewDeepCopyPiece(originalPiece);
+                    addPiece(chessPosition, deepCopiedPiece);
+                }
+            }
+        }
+    }
+
     @Override
     public void addPiece(ChessPosition position, ChessPiece piece) {
         chessBoard[position.getRow() - 1][position.getColumn() - 1] = piece;
@@ -45,6 +62,22 @@ public class ChessBoardImplementation implements ChessBoard {
             return new King(pieceColor, type);
         } else {
             return new Pawn(pieceColor, type);
+        }
+    }
+
+    private ChessPiece translateToNewDeepCopyPiece(ChessPiece originalPiece){
+        if (originalPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            return new Rook(originalPiece);
+        } else if (originalPiece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+            return new Knight(originalPiece);
+        } else if (originalPiece.getPieceType() == ChessPiece.PieceType.BISHOP) {
+            return new Bishop(originalPiece);
+        } else if (originalPiece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+            return new Queen(originalPiece);
+        } else if (originalPiece.getPieceType() == ChessPiece.PieceType.KING) {
+            return new King(originalPiece);
+        } else {
+            return new Pawn(originalPiece);
         }
     }
 

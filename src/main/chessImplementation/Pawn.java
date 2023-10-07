@@ -12,7 +12,12 @@ public class Pawn extends ChessPieceImplementation {
         super(color, type);
     }
 
+    public Pawn(ChessPiece originalPiece) {
+        super(originalPiece);
+    }
+
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        moves.clear();
         // First check team color to know if you can move up or down
         if (this.getTeamColor() == ChessGame.TeamColor.WHITE) {
             // check if pawn is in starting position first
