@@ -60,44 +60,16 @@ public class ChessGameImplementation implements ChessGame {
 
         playerMoves.addAll(chessPiece.pieceMoves(copyGame.getBoard(), startPosition));
         tempPlayerMoves.addAll(playerMoves);
-//        ChessPosition kingPosition = new ChessPositionImplementation(0, 0);
-
-//        for (var i = 1; i <= 8; i++) {
-//            for (var j = 1; j <= 8; j++) {
-//                ChessPosition chessPosition = new ChessPositionImplementation(i, j);
-//                ChessPiece currentPiece = copyGame.getBoard().getPiece(chessPosition);
-//
-//                if (currentPiece != null && currentPiece.getTeamColor() != getTeamTurn()) {
-//                    enemyMoves.addAll(currentPiece.pieceMoves(copyGame.getBoard(), chessPosition));
-//                }
-//                if (currentPiece != null && (currentPiece.getTeamColor() == getTeamTurn() && currentPiece.getPieceType() == ChessPiece.PieceType.KING)) {
-//                    kingPosition = chessPosition;
-//                }
-//            }
-//        }
 
         for (ChessMove chessMove : tempPlayerMoves) {
+            // reset the game to the original game state before checking each move in playerMoves
             copyGame = new ChessGameImplementation(this);
-//            copyGame.setBoard(board);
-//            try {
-//                makeMove(chessMove);
-//            } catch (InvalidMoveException e) {
-//                // remove the possible move if it puts king in check
-//                playerMoves.remove(chessMove);
-//            }
             copyGame.getBoard().removePiece(chessMove.getStartPosition());
             copyGame.getBoard().addPiece(chessMove.getEndPosition(), chessPiece);
             tempBoard = copyGame.getBoard();
-            if (isInCheck(getTeamTurn())) {
+            if (isInCheckValidMovesHelper(getTeamTurn())) {
                 playerMoves.remove(chessMove);
             }
-
-//            for (ChessMove enemyChessMove : enemyMoves) {
-//                ChessPosition endPosition = enemyChessMove.getEndPosition();
-//                if (endPosition.equals(kingPosition)) {
-//                    playerMoves.remove(chessMove);
-//                }
-//            }
         }
         return playerMoves;
     }
@@ -107,7 +79,6 @@ public class ChessGameImplementation implements ChessGame {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece chessPiece = board.getPiece(startPosition);
-        ChessGame copyGame = new ChessGameImplementation(this);
 
         // check if it's the turn of the player making the move first
         if (chessPiece.getTeamColor() != getTeamTurn()) {
@@ -124,14 +95,8 @@ public class ChessGameImplementation implements ChessGame {
         getBoard().addPiece(endPosition, chessPiece);
 
         // set new board state and clear current validMoves set for current piece
-        setBoard(copyGame.getBoard());
+        setBoard(getBoard());
         validMoves.clear();
-
-        // Check if new move put King for this team in check. If it did, revert move and throw exception
-//        if (isInCheck(chessPiece.getTeamColor())) {
-//            setBoard(copyBoard);
-//            throw new InvalidMoveException("This move puts the King in check!");
-//        }
 
         // change whose turn it is to make the next move
         if (chessPiece.getTeamColor() == TeamColor.WHITE) {
@@ -148,19 +113,38 @@ public class ChessGameImplementation implements ChessGame {
         // reset enemyValidMoves to check their new valid moves
         enemyValidMoves.clear();
 
-//        for (var i = 1; i <= 8; i++) {
-//            for (var j = 1; j <= 8; j++) {
-//                ChessPosition chessPosition = new ChessPositionImplementation(i, j);
-//                ChessPiece currentPiece = board.getPiece(chessPosition);
-//
-//                if (currentPiece != null && currentPiece.getTeamColor() != teamColor) {
-//                    validMoves.addAll(validMoves(chessPosition));
-//                }
-//                if (currentPiece != null && (currentPiece.getTeamColor() == teamColor && currentPiece.getPieceType() == ChessPiece.PieceType.KING)) {
-//                    kingPosition = chessPosition;
-//                }
-//            }
-//        }
+        for (var i = 1; i <= 8; i++) {
+            for (var j = 1; j <= 8; j++) {
+                ChessPosition chessPosition = new ChessPositionImplementation(i, j);
+                ChessPiece currentPiece = board.getPiece(chessPosition);
+
+                if (currentPiece != null && currentPiece.getTeamColor() != teamColor) {
+                    enemyValidMoves.addAll(currentPiece.pieceMoves(board, chessPosition));
+                }
+                if (currentPiece != null && (currentPiece.getTeamColor() == teamColor && currentPiece.getPieceType() == ChessPiece.PieceType.KING)) {
+                    kingPosition = chessPosition;
+                }
+            }
+        }
+        return isInCheckHelper(kingPosition);
+    }
+
+    private boolean isInCheckHelper(ChessPosition kingPosition) {
+        for (ChessMove chessMove : enemyValidMoves) {
+            ChessPosition endPosition = chessMove.getEndPosition();
+            if (endPosition.equals(kingPosition)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isInCheckValidMovesHelper(TeamColor teamColor) {
+        // Initialize to arbitrary value to start
+        ChessPosition kingPosition = new ChessPositionImplementation(0,0);
+        // reset enemyValidMoves to check their new valid moves
+        enemyValidMoves.clear();
+
         for (var i = 1; i <= 8; i++) {
             for (var j = 1; j <= 8; j++) {
                 ChessPosition chessPosition = new ChessPositionImplementation(i, j);
@@ -175,22 +159,6 @@ public class ChessGameImplementation implements ChessGame {
             }
         }
         return isInCheckHelper(kingPosition);
-    }
-
-    private boolean isInCheckHelper(ChessPosition kingPosition) {
-//        for (ChessMove chessMove : validMoves) {
-//            ChessPosition endPosition = chessMove.getEndPosition();
-//            if (endPosition.equals(kingPosition)) {
-//                return true;
-//            }
-//        }
-        for (ChessMove chessMove : enemyValidMoves) {
-            ChessPosition endPosition = chessMove.getEndPosition();
-            if (endPosition.equals(kingPosition)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
