@@ -26,16 +26,10 @@ public class ChessGameImplementation implements ChessGame {
 
     @Override
     public ChessGameImplementation clone() {
-        // Create a new ChessGameImplementation
+        // Create a new ChessGameImplementation and clone important data fields
         ChessGameImplementation cloneGame = new ChessGameImplementation();
-
-        // Deep copy the ChessBoard for the new game
         cloneGame.setBoard(new ChessBoardImplementation(this.getBoard()));
-
-        // Copy the team turn
         cloneGame.setTeamTurn(this.getTeamTurn());
-
-        // Copy other properties as needed
 
         return cloneGame;
     }
@@ -52,12 +46,17 @@ public class ChessGameImplementation implements ChessGame {
 
     @Override
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessGame copyGame = new ChessGameImplementation(this);
         Set<ChessMove> playerMoves = new HashSet<>();
         Set<ChessMove> tempPlayerMoves = new HashSet<>();
-        Set<ChessMove> enemyMoves = new HashSet<>();
-        ChessPiece chessPiece = copyGame.getBoard().getPiece(startPosition);
-        ChessBoard originalBoard = this.getBoard();
+        ChessPiece chessPiece = getBoard().getPiece(startPosition);
+
+        if (chessPiece == null) {
+            return null;
+        }
+
+        // figure out what team turn it is with this
+        setTeamTurn(chessPiece.getTeamColor());
+        ChessGame copyGame = new ChessGameImplementation(this);
 
         playerMoves.addAll(chessPiece.pieceMoves(copyGame.getBoard(), startPosition));
         tempPlayerMoves.addAll(playerMoves);
@@ -109,7 +108,6 @@ public class ChessGameImplementation implements ChessGame {
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece chessPiece = board.getPiece(startPosition);
         ChessGame copyGame = new ChessGameImplementation(this);
-        ChessBoard copyBoard = board;
 
         // check if it's the turn of the player making the move first
         if (chessPiece.getTeamColor() != getTeamTurn()) {
