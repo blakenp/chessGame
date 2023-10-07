@@ -79,6 +79,7 @@ public class ChessGameImplementation implements ChessGame {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece chessPiece = board.getPiece(startPosition);
+        ChessPiece promotionPiece = null;
 
         // check if it's the turn of the player making the move first
         if (chessPiece.getTeamColor() != getTeamTurn()) {
@@ -92,7 +93,21 @@ public class ChessGameImplementation implements ChessGame {
         }
 
         getBoard().removePiece(startPosition);
-        getBoard().addPiece(endPosition, chessPiece);
+
+        if (move.getPromotionPiece() != null) {
+            if (move.getPromotionPiece().name().equals("ROOK")) {
+                promotionPiece = new Rook(chessPiece.getTeamColor(), ChessPiece.PieceType.ROOK);
+            } else if (move.getPromotionPiece().name().equals("QUEEN")) {
+                promotionPiece = new Rook(chessPiece.getTeamColor(), ChessPiece.PieceType.QUEEN);
+            } else if (move.getPromotionPiece().name().equals("BISHOP")) {
+                promotionPiece = new Rook(chessPiece.getTeamColor(), ChessPiece.PieceType.BISHOP);
+            } else if (move.getPromotionPiece().name().equals("KNIGHT")) {
+                promotionPiece = new Rook(chessPiece.getTeamColor(), ChessPiece.PieceType.KNIGHT);
+            }
+            getBoard().addPiece(endPosition, promotionPiece);
+        } else {
+            getBoard().addPiece(endPosition, chessPiece);
+        }
 
         // set new board state and clear current validMoves set for current piece
         setBoard(getBoard());
