@@ -178,6 +178,22 @@ public class ChessGameImplementation implements ChessGame {
 
     @Override
     public boolean isInCheckmate(TeamColor teamColor) {
+        if (isInCheck(teamColor)) {
+            for (var i = 1; i <= 8; i++) {
+                for (var j = 1; j <= 8; j++) {
+                    ChessPosition chessPosition = new ChessPositionImplementation(i, j);
+                    ChessPiece currentPiece = board.getPiece(chessPosition);
+
+                    if (currentPiece != null && currentPiece.getTeamColor() == teamColor) {
+                        validMoves.addAll(validMoves(chessPosition));
+                    }
+                }
+            }
+
+            if (validMoves.isEmpty()) {
+                return true;
+            }
+        }
         return false;
     }
 
