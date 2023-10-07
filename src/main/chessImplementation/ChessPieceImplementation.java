@@ -15,6 +15,11 @@ public class ChessPieceImplementation implements ChessPiece {
         this.color = color;
         this.type = type;
     }
+
+    public ChessPieceImplementation(ChessPiece originalPiece) {
+        this.color = originalPiece.getTeamColor();
+        this.type = originalPiece.getPieceType();
+    }
     @Override
     public ChessGame.TeamColor getTeamColor() {
         return color;
@@ -27,10 +32,12 @@ public class ChessPieceImplementation implements ChessPiece {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        moves.clear();
         return moves;
     }
 
     public Collection<ChessMove> diagonalMoves(ChessBoard board, ChessPosition myPosition) {
+        moves.clear();
         ChessPosition currentPosition = myPosition;
 
         // left one and down one ( - - )
@@ -79,6 +86,7 @@ public class ChessPieceImplementation implements ChessPiece {
     }
 
     public Collection<ChessMove> cardinalMoves(ChessBoard board, ChessPosition myPosition) {
+        moves.clear();
         ChessPosition currentPosition = myPosition;
 
         // move up

@@ -1,9 +1,6 @@
 package chessImplementation;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -15,7 +12,12 @@ public class King extends ChessPieceImplementation {
         super(color, type);
     }
 
+    public King(ChessPiece originalPiece) {
+        super(originalPiece);
+    }
+
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        moves.clear();
         if (myPosition.getColumn() + 1 <= 8 && (board.getPiece(new ChessPositionImplementation(myPosition.getRow(), myPosition.getColumn() + 1)) == null || board.getPiece(new ChessPositionImplementation(myPosition.getRow(), myPosition.getColumn() + 1)).getTeamColor() != this.getTeamColor())) {
             moves.add(new ChessMoveImplementation(myPosition, new ChessPositionImplementation(myPosition.getRow(), myPosition.getColumn() + 1), null));
         }

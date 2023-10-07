@@ -1,9 +1,6 @@
 package chessImplementation;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -15,7 +12,12 @@ public class Knight extends ChessPieceImplementation {
         super(color, type);
     }
 
+    public Knight(ChessPiece originalPiece) {
+        super(originalPiece);
+    }
+
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        moves.clear();
         // Waluigi backwards L check below start position ( - 2, - 1)
         if ((myPosition.getRow() - 2 >= 1 && myPosition.getColumn() - 1 >= 1) && (board.getPiece(new ChessPositionImplementation(myPosition.getRow() - 2, myPosition.getColumn() - 1)) == null || board.getPiece(new ChessPositionImplementation(myPosition.getRow() - 2, myPosition.getColumn() - 1)).getTeamColor() != this.getTeamColor())) {
             moves.add(new ChessMoveImplementation(myPosition, new ChessPositionImplementation(myPosition.getRow() - 2, myPosition.getColumn() - 1), null));
