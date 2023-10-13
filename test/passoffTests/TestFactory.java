@@ -12,11 +12,11 @@ public class TestFactory {
     //Chess Functions
     //------------------------------------------------------------------------------------------------------------------
     public static ChessBoard getNewBoard() {
-        return new ChessBoardImplementation();
+        return new ChessBoardImpl();
     }
 
     public static ChessGame getNewGame() {
-		return new ChessGameImplementation();
+		return new ChessGameImpl();
     }
 
     public static ChessPiece getNewPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type){
@@ -36,11 +36,11 @@ public class TestFactory {
     }
 
     public static ChessPosition getNewPosition(Integer row, Integer col){
-		return new ChessPositionImplementation(row, col);
+		return new ChessPositionImpl(row, col);
     }
 
     public static ChessMove getNewMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece){
-		return new ChessMoveImplementation(startPosition, endPosition, promotionPiece);
+		return new ChessMoveImpl(startPosition, endPosition, promotionPiece);
     }
     //------------------------------------------------------------------------------------------------------------------
 

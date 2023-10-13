@@ -4,7 +4,7 @@ import chess.*;
 
 import java.util.Collection;
 
-public class Rook extends ChessPieceImplementation {
+public class Rook extends ChessPieceImpl {
     public Rook(ChessGame.TeamColor color, PieceType type) {
         super(color, type);
     }

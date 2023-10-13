@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ChessGameImplementation implements ChessGame {
+public class ChessGameImpl implements ChessGame {
     private ChessGame game;
     private TeamColor team;
     private ChessBoard board;
@@ -14,21 +14,21 @@ public class ChessGameImplementation implements ChessGame {
     private Set<ChessMove> validMoves = new HashSet<>();
     private Set<ChessMove> enemyValidMoves = new HashSet<>();
 
-    public ChessGameImplementation() {
-        this.board = new ChessBoardImplementation();
+    public ChessGameImpl() {
+        this.board = new ChessBoardImpl();
         this.team = TeamColor.WHITE;
     }
 
-    public ChessGameImplementation(ChessGame other) {
-        setBoard(new ChessBoardImplementation(other.getBoard()));
+    public ChessGameImpl(ChessGame other) {
+        setBoard(new ChessBoardImpl(other.getBoard()));
         setTeamTurn(other.getTeamTurn());
     }
 
     @Override
-    public ChessGameImplementation clone() {
+    public ChessGameImpl clone() {
         // Create a new ChessGameImplementation and clone important data fields
-        ChessGameImplementation cloneGame = new ChessGameImplementation();
-        cloneGame.setBoard(new ChessBoardImplementation(this.getBoard()));
+        ChessGameImpl cloneGame = new ChessGameImpl();
+        cloneGame.setBoard(new ChessBoardImpl(this.getBoard()));
         cloneGame.setTeamTurn(this.getTeamTurn());
 
         return cloneGame;
@@ -56,14 +56,14 @@ public class ChessGameImplementation implements ChessGame {
 
         // figure out what team turn it is with this
         setTeamTurn(chessPiece.getTeamColor());
-        ChessGame copyGame = new ChessGameImplementation(this);
+        ChessGame copyGame = new ChessGameImpl(this);
 
         playerMoves.addAll(chessPiece.pieceMoves(copyGame.getBoard(), startPosition));
         tempPlayerMoves.addAll(playerMoves);
 
         for (ChessMove chessMove : tempPlayerMoves) {
             // reset the game to the original game state before checking each move in playerMoves
-            copyGame = new ChessGameImplementation(this);
+            copyGame = new ChessGameImpl(this);
             copyGame.getBoard().removePiece(chessMove.getStartPosition());
             copyGame.getBoard().addPiece(chessMove.getEndPosition(), chessPiece);
             tempBoard = copyGame.getBoard();
@@ -124,13 +124,13 @@ public class ChessGameImplementation implements ChessGame {
     @Override
     public boolean isInCheck(TeamColor teamColor) {
         // Initialize to arbitrary value to start
-        ChessPosition kingPosition = new ChessPositionImplementation(0,0);
+        ChessPosition kingPosition = new ChessPositionImpl(0,0);
         // reset enemyValidMoves to check their new valid moves
         enemyValidMoves.clear();
 
         for (var i = 1; i <= 8; i++) {
             for (var j = 1; j <= 8; j++) {
-                ChessPosition chessPosition = new ChessPositionImplementation(i, j);
+                ChessPosition chessPosition = new ChessPositionImpl(i, j);
                 ChessPiece currentPiece = board.getPiece(chessPosition);
 
                 if (currentPiece != null && currentPiece.getTeamColor() != teamColor) {
@@ -156,13 +156,13 @@ public class ChessGameImplementation implements ChessGame {
 
     private boolean isInCheckValidMovesHelper(TeamColor teamColor) {
         // Initialize to arbitrary value to start
-        ChessPosition kingPosition = new ChessPositionImplementation(0,0);
+        ChessPosition kingPosition = new ChessPositionImpl(0,0);
         // reset enemyValidMoves to check their new valid moves
         enemyValidMoves.clear();
 
         for (var i = 1; i <= 8; i++) {
             for (var j = 1; j <= 8; j++) {
-                ChessPosition chessPosition = new ChessPositionImplementation(i, j);
+                ChessPosition chessPosition = new ChessPositionImpl(i, j);
                 ChessPiece currentPiece = tempBoard.getPiece(chessPosition);
 
                 if (currentPiece != null && currentPiece.getTeamColor() != teamColor) {
@@ -181,7 +181,7 @@ public class ChessGameImplementation implements ChessGame {
         if (isInCheck(teamColor)) {
             for (var i = 1; i <= 8; i++) {
                 for (var j = 1; j <= 8; j++) {
-                    ChessPosition chessPosition = new ChessPositionImplementation(i, j);
+                    ChessPosition chessPosition = new ChessPositionImpl(i, j);
                     ChessPiece currentPiece = board.getPiece(chessPosition);
 
                     if (currentPiece != null && currentPiece.getTeamColor() == teamColor) {
@@ -202,7 +202,7 @@ public class ChessGameImplementation implements ChessGame {
         if (!isInCheck(teamColor)) {
             for (var i = 1; i <= 8; i++) {
                 for (var j = 1; j <= 8; j++) {
-                    ChessPosition chessPosition = new ChessPositionImplementation(i, j);
+                    ChessPosition chessPosition = new ChessPositionImpl(i, j);
                     ChessPiece currentPiece = board.getPiece(chessPosition);
 
                     if (currentPiece != null && currentPiece.getTeamColor() == teamColor) {
