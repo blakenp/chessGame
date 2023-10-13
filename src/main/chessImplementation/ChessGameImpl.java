@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ChessGameImpl implements ChessGame {
-    private ChessGame game;
     private TeamColor team;
     private ChessBoard board;
     private ChessBoard tempBoard;
@@ -26,7 +25,6 @@ public class ChessGameImpl implements ChessGame {
 
     @Override
     public ChessGameImpl clone() {
-        // Create a new ChessGameImplementation and clone important data fields
         ChessGameImpl cloneGame = new ChessGameImpl();
         cloneGame.setBoard(new ChessBoardImpl(this.getBoard()));
         cloneGame.setTeamTurn(this.getTeamTurn());
