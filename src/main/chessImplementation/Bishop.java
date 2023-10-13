@@ -4,7 +4,7 @@ import chess.*;
 
 import java.util.Collection;
 
-public class Bishop extends ChessPieceImplementation {
+public class Bishop extends ChessPieceImpl {
     public Bishop(ChessGame.TeamColor color, PieceType type) {
         super(color, type);
     }

@@ -6,7 +6,7 @@ import chess.ChessPosition;
 
 import java.util.Objects;
 
-public class ChessMoveImplementation implements ChessMove {
+public class ChessMoveImpl implements ChessMove {
     private ChessPosition startPosition;
     private ChessPosition endPosition;
 
@@ -14,7 +14,7 @@ public class ChessMoveImplementation implements ChessMove {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ChessMoveImplementation that = (ChessMoveImplementation) o;
+        ChessMoveImpl that = (ChessMoveImpl) o;
         return Objects.equals(startPosition, that.startPosition) && Objects.equals(endPosition, that.endPosition) && promotionPiece == that.promotionPiece;
     }
 
@@ -25,7 +25,7 @@ public class ChessMoveImplementation implements ChessMove {
 
     private ChessPiece.PieceType promotionPiece;
 
-    public ChessMoveImplementation(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
+    public ChessMoveImpl(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;

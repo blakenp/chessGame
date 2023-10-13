@@ -5,20 +5,20 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
-public class ChessBoardImplementation implements ChessBoard {
+public class ChessBoardImpl implements ChessBoard {
     private ChessPiece[][] chessBoard;
 
-    public ChessBoardImplementation() {
+    public ChessBoardImpl() {
         this.chessBoard = new ChessPiece[8][8];
     }
 
     // copy constructor
-    public ChessBoardImplementation(ChessBoard originalBoard) {
+    public ChessBoardImpl(ChessBoard originalBoard) {
         this.chessBoard = new ChessPiece[8][8];
 
         for (var i = 1; i <= 8; i++) {
             for (var j = 1; j <= 8; j++) {
-                ChessPosition chessPosition = new ChessPositionImplementation(i, j);
+                ChessPosition chessPosition = new ChessPositionImpl(i, j);
                 ChessPiece originalPiece = originalBoard.getPiece(chessPosition);
 
                 if (originalPiece != null) {
@@ -102,20 +102,20 @@ public class ChessBoardImplementation implements ChessBoard {
 
     private void fillRows(ChessPosition position, ChessPiece.PieceType[] rowPieces, ChessGame.TeamColor teamColor) {
         for (var i = position.getColumn(); i <= 8; i++) { // add all of first row pieces
-            addPiece(new ChessPositionImplementation(position.getRow(), i), translateToNewPiece(teamColor, rowPieces[i - 1]));
+            addPiece(new ChessPositionImpl(position.getRow(), i), translateToNewPiece(teamColor, rowPieces[i - 1]));
         }
         for (var i = position.getColumn(); i <= 8; i++) { // add all the pawns now
             if (teamColor == ChessGame.TeamColor.BLACK) {
-                addPiece(new ChessPositionImplementation(position.getRow() - 1, i), translateToNewPiece(teamColor, ChessPiece.PieceType.PAWN));
+                addPiece(new ChessPositionImpl(position.getRow() - 1, i), translateToNewPiece(teamColor, ChessPiece.PieceType.PAWN));
             } else {
-                addPiece(new ChessPositionImplementation(position.getRow() + 1, i), translateToNewPiece(teamColor, ChessPiece.PieceType.PAWN));
+                addPiece(new ChessPositionImpl(position.getRow() + 1, i), translateToNewPiece(teamColor, ChessPiece.PieceType.PAWN));
             }
         }
     }
 
     @Override
     public void resetBoard() {
-        setDefaultPositions(new ChessPositionImplementation(1, 1));
-        setDefaultPositions(new ChessPositionImplementation(8, 1));
+        setDefaultPositions(new ChessPositionImpl(1, 1));
+        setDefaultPositions(new ChessPositionImpl(8, 1));
     }
 }
