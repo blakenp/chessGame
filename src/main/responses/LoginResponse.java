@@ -32,22 +32,6 @@ public class LoginResponse {
     }
 
     /**
-     * A getter method for the user's auth token
-     * @return The user's auth token
-     */
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    /**
-     * A getter method for the response's error message
-     * @return The error message
-     */
-    public String getMessage() {
-        return message;
-    }
-
-    /**
      * A setter method for setting the user's username
      * @param username The user's new username
      */
@@ -56,11 +40,27 @@ public class LoginResponse {
     }
 
     /**
+     * A getter method for the user's auth token
+     * @return The user's auth token
+     */
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    /**
      * A setter method for setting the user's auth token
      * @param authToken The user's new auth token
      */
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
+    }
+
+    /**
+     * A getter method for the response's error message
+     * @return The error message
+     */
+    public String getMessage() {
+        return message;
     }
 
     /**

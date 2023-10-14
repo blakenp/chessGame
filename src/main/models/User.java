@@ -31,22 +31,6 @@ public class User {
     }
 
     /**
-     * A getter method for the user's password
-     * @return The user's password
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * A getter method for user's email
-     * @return The user's email
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
      * A setter method for the user's username
      * @param username The user's new username
      */
@@ -55,11 +39,27 @@ public class User {
     }
 
     /**
+     * A getter method for the user's password
+     * @return The user's password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
      * A setter method for the user's password
      * @param password The user's new password
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     * A getter method for user's email
+     * @return The user's email
+     */
+    public String getEmail() {
+        return email;
     }
 
     /**

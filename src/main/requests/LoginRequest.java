@@ -28,19 +28,19 @@ public class LoginRequest {
     }
 
     /**
-     * A getter method for the user's password
-     * @return The user's password
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
      * A setter method for setting the user's username
      * @param username The user's new username
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    /**
+     * A getter method for the user's password
+     * @return The user's password
+     */
+    public String getPassword() {
+        return password;
     }
 
     /**
