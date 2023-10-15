@@ -1,0 +1,74 @@
+package responses;
+
+/**
+ * Object representation of the response the client can receive from registering for
+ * making a new account for their user.
+ */
+public class RegisterResponse {
+    private String username;
+    private String authToken;
+    private String message;
+
+    /**
+     * RegisterResponse object constructor that will be instantiated to respond to client register requests.
+     * It can return either a username and auth token upon successful requests or possible error
+     * messages upon failed requests.
+     *
+     * @param username The user's username that they will appear to others as
+     * @param authToken The user's authToken used to make api requests to other endpoints on the server
+     * @param message The error message that will appear for certain API error status codes if the RegisterRequest object received is rejected
+     */
+    public RegisterResponse(String username, String authToken, String message) {
+        this.username = username;
+        this.authToken = authToken;
+        this.message = message;
+    }
+
+    /**
+     * A getter method for the user's username
+     * @return The user's username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * A setter method for setting the user's username
+     * @param username The user's new username
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * A getter method for the user's auth token
+     * @return The user's auth token
+     */
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    /**
+     * A setter method for setting the user's auth token
+     * @param authToken The user's new auth token
+     */
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    /**
+     * A getter method for the response's error message
+     * @return The error message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * A setter method for setting the error message
+     * @param message The new desired error message to set message to
+     */
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}
