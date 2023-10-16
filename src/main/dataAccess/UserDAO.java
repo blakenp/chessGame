@@ -10,6 +10,17 @@ import java.util.List;
 public class UserDAO implements DAO<User> {
 
     /**
+     * A method that queries the database for a user and returns it if it is found in the database
+     * @param user The user that will be queried for in the database
+     * @return The user if found
+     * @throws DataAccessException An exception if an error occurs in accessing the data or if user is not found
+     */
+    @Override
+    public User get(User user) throws DataAccessException {
+        return null;
+    }
+
+    /**
      * A method that returns a list of all the users stored in the database
      * @return A list of all the users stored in the database
      * @throws DataAccessException An exception if an error occurs in accessing the data
