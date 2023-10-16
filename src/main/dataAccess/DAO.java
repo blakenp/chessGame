@@ -12,12 +12,6 @@ import java.util.List;
 public interface DAO<T> {
 
     /**
-     * An abstract get method that can be used to get anything from the database
-     * @return an object returned from a query on the database
-     */
-    T get(T object) throws DataAccessException;
-
-    /**
      * An abstract getAll method that can be used to get a list of all objects that
      * meet a query's expectations
      * @return A list of object returned from a query on the database

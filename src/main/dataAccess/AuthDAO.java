@@ -9,17 +9,6 @@ import java.util.List;
  * authentication of users for the chess game app
  */
 public class AuthDAO implements DAO<AuthToken> {
-    /**
-     * A method that will retrieve a single auth token from the database
-     *
-     * @param object the auth token that you want to grab from the database
-     * @return The auth token
-     * @throws DataAccessException DataAccessException An exception if an error occurs in accessing the data
-     */
-    @Override
-    public AuthToken get(AuthToken object) throws DataAccessException {
-        return null;
-    }
 
     /**
      * A method that will retrieve all the currently stored auth tokens in the database. I may make this always
