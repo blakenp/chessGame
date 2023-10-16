@@ -11,6 +11,17 @@ import java.util.List;
 public class AuthDAO implements DAO<AuthToken> {
 
     /**
+     * A method that queries the database for an auth token and returns it if it is found in the database
+     * @param authToken The auth token that will be queried for in the database
+     * @return The auth token if it is found
+     * @throws DataAccessException An exception if an error occurs in accessing the data or if auth token is not found
+     */
+    @Override
+    public AuthToken get(AuthToken authToken) throws DataAccessException {
+        return null;
+    }
+
+    /**
      * A method that will retrieve all the currently stored auth tokens in the database. I may make this always
      * throw a DataAccessException just for security reasons though
      *
