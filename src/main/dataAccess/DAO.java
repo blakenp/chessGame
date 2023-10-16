@@ -15,7 +15,7 @@ public interface DAO<T> {
      * An abstract get method that can be used to get anything from the database
      * @return an object returned from a query on the database
      */
-    T get() throws DataAccessException;
+    T get(T object) throws DataAccessException;
 
     /**
      * An abstract getAll method that can be used to get a list of all objects that

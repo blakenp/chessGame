@@ -7,7 +7,7 @@ import java.util.List;
 public class UserDAO implements DAO<User> {
 
     @Override
-    public User get() throws DataAccessException {
+    public User get(User user) throws DataAccessException {
         return null;
     }
 
