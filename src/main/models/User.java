@@ -4,8 +4,17 @@ package models;
  * Object representation of a user. Mainly just consists of the username, password, and email fields
  */
 public class User {
+    /**
+     * Data field representing a user's username
+     */
     private String username;
+    /**
+     * Data field representing a user's password
+     */
     private String password;
+    /**
+     * Data field representing a user's email
+     */
     private String email;
 
     /**
@@ -24,6 +33,7 @@ public class User {
 
     /**
      * A getter method for user's username
+     *
      * @return The user's username
      */
     public String getUsername() {
@@ -32,6 +42,7 @@ public class User {
 
     /**
      * A setter method for the user's username
+     *
      * @param username The user's new username
      */
     public void setUsername(String username) {
@@ -40,6 +51,7 @@ public class User {
 
     /**
      * A getter method for the user's password
+     *
      * @return The user's password
      */
     public String getPassword() {
@@ -48,6 +60,7 @@ public class User {
 
     /**
      * A setter method for the user's password
+     *
      * @param password The user's new password
      */
     public void setPassword(String password) {
@@ -56,6 +69,7 @@ public class User {
 
     /**
      * A getter method for user's email
+     *
      * @return The user's email
      */
     public String getEmail() {
@@ -64,6 +78,7 @@ public class User {
 
     /**
      * A setter method for the user's email
+     *
      * @param email The user's new email
      */
     public void setEmail(String email) {

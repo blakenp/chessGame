@@ -6,10 +6,25 @@ import chess.ChessGame;
  * Object representation of a game with an id that can be used as a room to host online chess games
  */
 public class Game {
+    /**
+     * Data field representing a game's ID
+     */
     private int gameID;
+    /**
+     * Data field representing a game's white team player's username
+     */
     private String whiteUsername;
+    /**
+     * Data field representing a game's black team player's username
+     */
     private String blackUsername;
+    /**
+     * Data field representing a game's name
+     */
     private String gameName;
+    /**
+     * Data field representing the chess game of the Game object
+     */
     private ChessGame game;
 
     /**
@@ -32,6 +47,7 @@ public class Game {
 
     /**
      * A getter method for the game's ID
+     *
      * @return The game's ID
      */
     public int getGameID() {
@@ -40,6 +56,7 @@ public class Game {
 
     /**
      * A setter method for setting the game's ID
+     *
      * @param gameID The game's new game ID
      */
     public void setGameID(int gameID) {
@@ -48,6 +65,7 @@ public class Game {
 
     /**
      * A getter method for the username of the game's white team player
+     *
      * @return The game's white team player name
      */
     public String getWhiteUsername() {
@@ -56,6 +74,7 @@ public class Game {
 
     /**
      * A setter method for setting the username of the game's white team player
+     *
      * @param whiteUsername The new username for the game's white team player
      */
     public void setWhiteUsername(String whiteUsername) {
@@ -64,6 +83,7 @@ public class Game {
 
     /**
      * A getter method for the username of the game's black team
+     *
      * @return The game's black team player name
      */
     public String getBlackUsername() {
@@ -72,6 +92,7 @@ public class Game {
 
     /**
      * A setter method for setting the username of the game's black team player
+     *
      * @param blackUsername The new username for the game's black team player
      */
     public void setBlackUsername(String blackUsername) {
@@ -80,6 +101,7 @@ public class Game {
 
     /**
      * A getter method for the game's name
+     *
      * @return The game's name
      */
     public String getGameName() {
@@ -88,6 +110,7 @@ public class Game {
 
     /**
      * A setter method for setting the game's name
+     *
      * @param gameName The game's new name
      */
     public void setGameName(String gameName) {
@@ -96,6 +119,7 @@ public class Game {
 
     /**
      * A getter method for the game's chess game object that includes the board, rules, and pieces
+     *
      * @return The game's chess game object
      */
     public ChessGame getGame() {
@@ -104,6 +128,7 @@ public class Game {
 
     /**
      * A setter method for setting the game's chess game object
+     *
      * @param game The game's new chess game object
      */
     public void setGame(ChessGame game) {
