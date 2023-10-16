@@ -10,7 +10,7 @@ public class CreateGameRequest {
      * CreateGameRequest object constructor that when initialized will request object with a game name
      * that will be used to set the chess game session's name.
      *
-     * @param gameName
+     * @param gameName the name of the game that will be created
      */
     public CreateGameRequest(String gameName) {
         this.gameName = gameName;
