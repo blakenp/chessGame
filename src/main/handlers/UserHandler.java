@@ -15,8 +15,8 @@ public class UserHandler {
         UserService userService = new UserService();
         RegisterResponse registerResponse = userService.register(registerRequest);
 
-        if (registerResponse.getMessage() != null) {
-            switch (registerResponse.getMessage()) {
+        if (registerResponse.getErrorMessage() != null) {
+            switch (registerResponse.getErrorMessage()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: already taken" -> response.status(403);
                 case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(404);
