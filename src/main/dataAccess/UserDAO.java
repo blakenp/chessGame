@@ -2,12 +2,23 @@ package dataAccess;
 
 import models.User;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Object representation of the data access object used to store and fetch the data related to users in the database
  */
 public class UserDAO implements DAO<User> {
+
+    private Map<String, User> users = new HashMap<>();
+
+    public boolean contains(User user) {
+        if (users.containsKey(user.username())) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * A method that queries the database for a user and returns it if it is found in the database
@@ -37,7 +48,11 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public void post(User user) throws DataAccessException {
-
+        try {
+            users.put(user.username(), user);
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to create new user");
+        }
     }
 
     /**

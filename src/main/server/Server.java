@@ -1,9 +1,11 @@
 package server;
 
+import com.google.gson.Gson;
+import requests.RegisterRequest;
+import responses.RegisterResponse;
 import spark.Spark;
-
 import java.util.ArrayList;
-import static spark.Spark.*;
+import handlers.*;
 
 public class Server {
     private ArrayList<String> names = new ArrayList<>();
@@ -20,6 +22,15 @@ public class Server {
         Spark.externalStaticFileLocation("web");
 
         createRoutes();
+
+        Spark.delete("/db", (request, response) -> {
+            response.type("application/json");
+            return "{\"message\": \"Hello from /db\"}";
+        });
+
+        Spark.post("/user", (request, response) ->
+                UserHandler.handleRegisterUser(request, response)
+        );
 
         // Register handlers for each endpoint using the method reference syntax
 //        Spark.post("/name/:name", this::addName);

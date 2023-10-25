@@ -1,12 +1,30 @@
 package handlers;
 
+import com.google.gson.Gson;
 import requests.RegisterRequest;
 import responses.RegisterResponse;
-
-import java.io.IOException;
+import services.UserService;
+import spark.Request;
+import spark.Response;
 
 public class UserHandler {
-    public static String handleRegister(RegisterRequest req, RegisterResponse res) throws IOException {
-        return null;
+    public static String handleRegisterUser(Request request, Response response) {
+        Gson gson = new Gson();
+        RegisterRequest registerRequest = gson.fromJson(request.body(), RegisterRequest.class);
+
+        UserService userService = new UserService();
+        RegisterResponse registerResponse = userService.register(registerRequest);
+
+        if (registerResponse.getMessage() != null) {
+            switch (registerResponse.getMessage()) {
+                case "Error: bad request" -> response.status(400);
+                case "Error: already taken" -> response.status(403);
+                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(404);
+                case "Error: an internal server error has occurred" -> response.status(500);
+            }
+        }
+
+        System.out.println(gson.toJson(registerResponse));
+        return gson.toJson(registerResponse);
     }
 }
