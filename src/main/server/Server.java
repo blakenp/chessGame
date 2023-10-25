@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import handlers.*;
 
 public class Server {
-    private ArrayList<String> names = new ArrayList<>();
 
     public static void main(String[] args) {
         new Server().run();

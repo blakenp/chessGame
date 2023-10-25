@@ -8,14 +8,17 @@ import spark.Request;
 import spark.Response;
 
 public class UserHandler {
+
+    private static UserService userService = new UserService();
+
     public static String handleRegisterUser(Request request, Response response) {
         Gson gson = new Gson();
         RegisterRequest registerRequest = gson.fromJson(request.body(), RegisterRequest.class);
 
-        UserService userService = new UserService();
         RegisterResponse registerResponse = userService.register(registerRequest);
 
         if (registerResponse.getErrorMessage() != null) {
+            System.out.println("in right place");
             switch (registerResponse.getErrorMessage()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: already taken" -> response.status(403);

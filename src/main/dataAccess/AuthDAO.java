@@ -2,13 +2,25 @@ package dataAccess;
 
 import models.AuthToken;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Object representation of the data access object that will be used to store and fetch data relating to the
  * authentication of users for the chess game app
  */
 public class AuthDAO implements DAO<AuthToken> {
+
+    private static AuthDAO instance = null;
+    private Map<String, AuthToken> authTokens = new HashMap<>();
+
+    public static AuthDAO getInstance() {
+        if (instance == null) {
+            instance = new AuthDAO();
+        }
+        return instance;
+    }
 
     /**
      * A method that queries the database for an auth token and returns it if it is found in the database
@@ -40,7 +52,7 @@ public class AuthDAO implements DAO<AuthToken> {
      */
     @Override
     public void post(AuthToken authToken) throws DataAccessException {
-
+        authTokens.put(authToken.authToken(), authToken);
     }
 
     /**

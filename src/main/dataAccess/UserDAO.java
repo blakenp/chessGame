@@ -2,6 +2,7 @@ package dataAccess;
 
 import models.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,16 @@ import java.util.Map;
  */
 public class UserDAO implements DAO<User> {
 
+    private static UserDAO instance = null;
+
     private Map<String, User> users = new HashMap<>();
+
+    public static UserDAO getInstance() {
+        if (instance == null) {
+            instance = new UserDAO();
+        }
+        return instance;
+    }
 
     public boolean contains(User user) {
         if (users.containsKey(user.username())) {
@@ -28,7 +38,7 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public User get(User user) throws DataAccessException {
-        return null;
+        return users.get(user.username());
     }
 
     /**
@@ -38,7 +48,13 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public List<User> getAll() throws DataAccessException {
-        return null;
+        List<User> usersList = new ArrayList<>();
+
+        for (User user : users.values()) {
+            usersList.add(user);
+        }
+
+        return usersList;
     }
 
     /**
