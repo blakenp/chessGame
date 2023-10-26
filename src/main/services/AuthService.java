@@ -76,6 +76,6 @@ public class AuthService {
         } catch (Exception exception) {
             return new LogoutResponse("Error: an internal server error has occurred");
         }
-        return new LogoutResponse("");
+        return new LogoutResponse("Successful Logout");
     }
 }

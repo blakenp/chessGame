@@ -1,7 +1,6 @@
 package dataAccess;
 
 import models.Game;
-import models.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +31,14 @@ public class GameDAO implements DAO<Game> {
     @Override
     public Game get(Game game) throws DataAccessException {
         try {
+            if (game.gameName() == null) {
+                for (Game gameObject : games.values()) {
+                    if (gameObject.gameID() == game.gameID()) {
+                        return  gameObject;
+                    }
+                }
+                return null;
+            }
             return games.get(game.gameName());
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to get a game from the database");

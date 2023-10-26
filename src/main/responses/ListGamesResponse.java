@@ -2,6 +2,8 @@ package responses;
 
 import models.Game;
 
+import java.util.List;
+
 /**
  * Object representation of the response you can get when requesting a list of all the chess games
  * in the database.
@@ -10,7 +12,7 @@ public class ListGamesResponse extends ErrorResponse {
     /**
      * Data field representing a list of chess games
      */
-    private Game[] games;
+    private List<Game> games;
 
     /**
      * ListGamesResponse object constructor that can be instantiated by passing in a list of all the games
@@ -18,7 +20,7 @@ public class ListGamesResponse extends ErrorResponse {
      *
      * @param games A list of games in the database
      */
-    public ListGamesResponse(Game[] games) {
+    public ListGamesResponse(List<Game> games) {
         super(null);
         this.games = games;
     }
@@ -32,7 +34,7 @@ public class ListGamesResponse extends ErrorResponse {
      *
      * @return The list of games from the database
      */
-    public Game[] getGames() {
+    public List<Game> getGames() {
         return games;
     }
 }

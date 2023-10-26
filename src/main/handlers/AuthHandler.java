@@ -47,6 +47,7 @@ public class AuthHandler {
         if (logoutResponse.getErrorMessage() != null) {
             switch (logoutResponse.getErrorMessage()) {
                 case "Error: invalid auth token" -> response.status(401);
+                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(500);
                 case "Error: an internal server error has occurred" -> response.status(500);
             }
         }
