@@ -3,11 +3,7 @@ package responses;
 /**
  * Object representation of the response received by the client when making a request to join a chess game session
  */
-public class JoinGameResponse {
-    /**
-     * Data field representing an error message
-     */
-    private String message;
+public class JoinGameResponse extends ErrorResponse {
 
     /**
      * JoinResponse object constructor that just sets the error message if the response
@@ -16,15 +12,6 @@ public class JoinGameResponse {
      * @param message The error message
      */
     public JoinGameResponse(String message) {
-        this.message = message;
-    }
-
-    /**
-     * A getter method for the JoinGame response's error message
-     *
-     * @return The JoinGame response's error message
-     */
-    public String getMessage() {
-        return message;
+        super(message);
     }
 }

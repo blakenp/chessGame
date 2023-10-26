@@ -23,11 +23,11 @@ public class UserService {
      * @return A successful register response for registering the client for a new account or a response with an error message
      */
     public RegisterResponse register(RegisterRequest request) {
-        User newUser = new User(request.getUsername(), request.getPassword(), request.getEmail());
+        User newUser = new User(request.username(), request.password(), request.email());
         AuthToken authToken = new AuthToken(newUser.username(), UUID.randomUUID().toString());
 
         try {
-            if ((request.getUsername() == null) || (request.getPassword() == null) || (request.getEmail() == null)) {
+            if ((request.username() == null) || (request.password() == null) || (request.email() == null)) {
                 return new RegisterResponse("Error: bad request");
             }
 
@@ -42,6 +42,6 @@ public class UserService {
         } catch (Exception exception) {
             return new RegisterResponse("Error: an internal server error has occurred");
         }
-        return new RegisterResponse(request.getUsername(), authToken.authToken());
+        return new RegisterResponse(request.username(), authToken.authToken());
     }
 }

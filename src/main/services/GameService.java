@@ -1,8 +1,10 @@
 package services;
 
 import chessImplementation.ChessGameImpl;
+import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
+import models.AuthToken;
 import models.Game;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
@@ -18,24 +20,30 @@ import java.util.Random;
  */
 public class GameService {
     private GameDAO gameDAO = GameDAO.getInstance();
+    private AuthDAO authDAO = AuthDAO.getInstance();
     /**
      * A method that takes in a request from the client and parses it to create a new chess game session to play
      * @param request Object representation of the client's request to create a new chess game session to play
      * @return A successful CreateGameResponse or an error message due to errors that can occur with the request
      */
     public CreateGameResponse createGame(CreateGameRequest request) {
+        AuthToken authToken = new AuthToken(null, request.authToken());
         Random random = new Random();
         int randomGameID = random.nextInt(1000);
 
-        Game newGame = new Game(randomGameID, null, null, request.getGameName(), new ChessGameImpl());
+        Game newGame = new Game(randomGameID, null, null, request.gameName(), new ChessGameImpl());
 
         try {
-            if (request.getGameName() == null) {
+            if (request.gameName() == null) {
                 return new CreateGameResponse("Error: bad request");
             }
 
             if (gameDAO.get(newGame) != null) {
                 return new CreateGameResponse("Error: already taken");
+            }
+
+            if (authDAO.get(authToken) == null) {
+                return new CreateGameResponse("Error: unauthorized");
             }
 
             gameDAO.post(newGame);

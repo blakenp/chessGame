@@ -38,6 +38,14 @@ public class Server {
                 GameHandler.handleCreateGame(request, response)
         );
 
+        Spark.put("/game", (request, response) ->
+                GameHandler.handleJoinGame(request, response)
+        );
+
+        Spark.get("/game", (request, response) ->
+                GameHandler.handleListGames(request, response)
+        );
+
         // Register handlers for each endpoint using the method reference syntax
 //        Spark.post("/name/:name", this::addName);
 //        Spark.get("/name", this::listNames);

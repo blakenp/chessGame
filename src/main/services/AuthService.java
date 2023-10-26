@@ -30,8 +30,8 @@ public class AuthService {
      * @return The response given back to the client after requesting to log in. Will result in either a successful login or error
      */
     public LoginResponse login(LoginRequest request) {
-        AuthToken authToken = new AuthToken(request.getUsername(), UUID.randomUUID().toString());
-        User user = new User(authToken.username(), "", "");
+        AuthToken authToken = new AuthToken(request.username(), UUID.randomUUID().toString());
+        User user = new User(authToken.username(), null, null);
 
         try {
             user = userDAO.get(user);
@@ -44,7 +44,7 @@ public class AuthService {
                 return new LoginResponse("Error: invalid auth token");
             }
 
-            if (!Objects.equals(user.password(), request.getPassword())) {
+            if (!Objects.equals(user.password(), request.password())) {
                 return new LoginResponse("Error: unauthorized");
             }
 
@@ -54,7 +54,7 @@ public class AuthService {
         } catch (Exception exception) {
             return new LoginResponse("Error: an internal server error has occurred");
         }
-        return new LoginResponse(request.getUsername(), authToken.authToken());
+        return new LoginResponse(request.username(), authToken.authToken());
     }
 
     /**
