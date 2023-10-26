@@ -1,13 +1,27 @@
 package dataAccess;
 
 import models.Game;
+import models.User;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Object representation of the data access object used to store and fetch data relating to chess games in the database
  */
 public class GameDAO implements DAO<Game> {
+
+    private static GameDAO instance = null;
+
+    private Map<String, User> games = new HashMap<>();
+
+    public static GameDAO getInstance() {
+        if (instance == null) {
+            instance = new GameDAO();
+        }
+        return instance;
+    }
 
     /**
      * A method that queries the database for a game and returns it if it is found in the database
@@ -58,5 +72,13 @@ public class GameDAO implements DAO<Game> {
     @Override
     public void delete(Game game) throws DataAccessException {
 
+    }
+
+    public void deleteAll() throws DataAccessException {
+        try {
+            games.clear();
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to clear games from database");
+        }
     }
 }

@@ -32,13 +32,13 @@ public class UserService {
                 return new RegisterResponse("Error: bad request");
             }
 
-            if (userDAO.contains(newUser)) {
+            if (userDAO.get(newUser) != null) {
                 return new RegisterResponse("Error: already taken");
             }
 
             userDAO.post(newUser);
             authDAO.post(authToken);
-        } catch (DataAccessException exception) {
+        } catch (DataAccessException dataAccessException) {
             return new RegisterResponse("Error: an error occurred accessing, creating, deleting, or updating data");
         } catch (Exception exception) {
             return new RegisterResponse("Error: an internal server error has occurred");

@@ -30,7 +30,11 @@ public class AuthDAO implements DAO<AuthToken> {
      */
     @Override
     public AuthToken get(AuthToken authToken) throws DataAccessException {
-        return null;
+        try {
+            return authTokens.get(authToken.authToken());
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to get auth token");
+        }
     }
 
     /**
@@ -42,7 +46,7 @@ public class AuthDAO implements DAO<AuthToken> {
      */
     @Override
     public List<AuthToken> getAll() throws DataAccessException {
-        return null;
+        throw new DataAccessException("Error: unauthorized");
     }
 
     /**
@@ -62,7 +66,7 @@ public class AuthDAO implements DAO<AuthToken> {
      */
     @Override
     public void put(AuthToken authToken) throws DataAccessException {
-
+        throw new DataAccessException("Error: unauthorized");
     }
 
     /**
@@ -72,6 +76,18 @@ public class AuthDAO implements DAO<AuthToken> {
      */
     @Override
     public void delete(AuthToken authToken) throws DataAccessException {
+        try {
+            authTokens.remove(authToken.authToken());
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: Failed to delete auth token");
+        }
+    }
 
+    public void deleteAll() throws DataAccessException {
+        try {
+            authTokens.clear();
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to clear auth tokens from database");
+        }
     }
 }

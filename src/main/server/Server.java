@@ -1,10 +1,6 @@
 package server;
 
-import com.google.gson.Gson;
-import requests.RegisterRequest;
-import responses.RegisterResponse;
 import spark.Spark;
-import java.util.ArrayList;
 import handlers.*;
 
 public class Server {
@@ -22,13 +18,20 @@ public class Server {
 
         createRoutes();
 
-        Spark.delete("/db", (request, response) -> {
-            response.type("application/json");
-            return "{\"message\": \"Hello from /db\"}";
-        });
+        Spark.delete("/db", (request, response) ->
+            TestingHandler.handleClear(request, response)
+        );
 
         Spark.post("/user", (request, response) ->
                 UserHandler.handleRegisterUser(request, response)
+        );
+
+        Spark.post("/session", (request, response) ->
+                AuthHandler.handleLogin(request, response)
+        );
+
+        Spark.delete("/session", (request, response) ->
+                AuthHandler.handleLogout(request, response)
         );
 
         // Register handlers for each endpoint using the method reference syntax

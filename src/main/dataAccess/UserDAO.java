@@ -23,13 +23,6 @@ public class UserDAO implements DAO<User> {
         return instance;
     }
 
-    public boolean contains(User user) {
-        if (users.containsKey(user.username())) {
-            return true;
-        }
-        return false;
-    }
-
     /**
      * A method that queries the database for a user and returns it if it is found in the database
      * @param user The user that will be queried for in the database
@@ -38,7 +31,11 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public User get(User user) throws DataAccessException {
-        return users.get(user.username());
+        try {
+            return users.get(user.username());
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to get user data");
+        }
     }
 
     /**
@@ -50,10 +47,13 @@ public class UserDAO implements DAO<User> {
     public List<User> getAll() throws DataAccessException {
         List<User> usersList = new ArrayList<>();
 
-        for (User user : users.values()) {
-            usersList.add(user);
+        try {
+            for (User user : users.values()) {
+                usersList.add(user);
+            }
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to get all users");
         }
-
         return usersList;
     }
 
@@ -78,7 +78,12 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public void put(User user) throws DataAccessException {
-
+        try {
+            users.remove(user.username());
+            users.put(user.username(), user);
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to update user");
+        }
     }
 
     /**
@@ -88,6 +93,18 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public void delete(User user) throws DataAccessException {
+        try {
+            users.remove(user);
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to delete user");
+        }
+    }
 
+    public void deleteAll() throws DataAccessException {
+        try {
+            users.clear();
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to clear users from database");
+        }
     }
 }

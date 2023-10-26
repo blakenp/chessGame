@@ -18,11 +18,10 @@ public class UserHandler {
         RegisterResponse registerResponse = userService.register(registerRequest);
 
         if (registerResponse.getErrorMessage() != null) {
-            System.out.println("in right place");
             switch (registerResponse.getErrorMessage()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: already taken" -> response.status(403);
-                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(404);
+                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(500);
                 case "Error: an internal server error has occurred" -> response.status(500);
             }
         }
