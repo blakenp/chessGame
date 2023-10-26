@@ -3,6 +3,7 @@ package dataAccess;
 import models.Game;
 import models.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +14,7 @@ import java.util.Map;
 public class GameDAO implements DAO<Game> {
 
     private static GameDAO instance = null;
-
-    private Map<String, User> games = new HashMap<>();
+    private Map<String, Game> games = new HashMap<>();
 
     public static GameDAO getInstance() {
         if (instance == null) {
@@ -31,7 +31,11 @@ public class GameDAO implements DAO<Game> {
      */
     @Override
     public Game get(Game game) throws DataAccessException {
-        return null;
+        try {
+            return games.get(game.gameName());
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to get a game from the database");
+        }
     }
 
     /**
@@ -41,7 +45,16 @@ public class GameDAO implements DAO<Game> {
      */
     @Override
     public List<Game> getAll() throws DataAccessException {
-        return null;
+        List<Game> gamesList = new ArrayList<>();
+
+        try {
+            for (Game game : games.values()) {
+                gamesList.add(game);
+            }
+            return gamesList;
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to get all users");
+        }
     }
 
     /**
@@ -51,7 +64,11 @@ public class GameDAO implements DAO<Game> {
      */
     @Override
     public void post(Game game) throws DataAccessException {
-
+        try {
+            games.put(game.gameName(), game);
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to add new game to database");
+        }
     }
 
     /**
@@ -61,7 +78,12 @@ public class GameDAO implements DAO<Game> {
      */
     @Override
     public void put(Game game) throws DataAccessException {
-
+        try {
+            games.remove(game.gameName());
+            games.put(game.gameName(), game);
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to update user");
+        }
     }
 
     /**
@@ -71,7 +93,11 @@ public class GameDAO implements DAO<Game> {
      */
     @Override
     public void delete(Game game) throws DataAccessException {
-
+        try {
+            games.remove(game.gameName());
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to delete game from database");
+        }
     }
 
     public void deleteAll() throws DataAccessException {

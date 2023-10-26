@@ -34,6 +34,10 @@ public class Server {
                 AuthHandler.handleLogout(request, response)
         );
 
+        Spark.post("/game", (request, response) ->
+                GameHandler.handleCreateGame(request, response)
+        );
+
         // Register handlers for each endpoint using the method reference syntax
 //        Spark.post("/name/:name", this::addName);
 //        Spark.get("/name", this::listNames);

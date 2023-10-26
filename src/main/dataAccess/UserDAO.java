@@ -13,7 +13,6 @@ import java.util.Map;
 public class UserDAO implements DAO<User> {
 
     private static UserDAO instance = null;
-
     private Map<String, User> users = new HashMap<>();
 
     public static UserDAO getInstance() {
@@ -51,10 +50,10 @@ public class UserDAO implements DAO<User> {
             for (User user : users.values()) {
                 usersList.add(user);
             }
+            return usersList;
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to get all users");
         }
-        return usersList;
     }
 
     /**
