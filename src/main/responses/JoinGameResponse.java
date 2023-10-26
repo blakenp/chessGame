@@ -27,13 +27,4 @@ public class JoinGameResponse {
     public String getMessage() {
         return message;
     }
-
-    /**
-     * A setter method for setting the JoinGame response's error message
-     *
-     * @param message The new error message that will be set
-     */
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

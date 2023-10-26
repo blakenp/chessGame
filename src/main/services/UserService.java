@@ -8,7 +8,6 @@ import models.User;
 import requests.RegisterRequest;
 import responses.RegisterResponse;
 
-import java.util.List;
 import java.util.UUID;
 
 /**

@@ -23,12 +23,4 @@ public class CreateGameRequest {
     public String getGameName() {
         return gameName;
     }
-
-    /**
-     * A setter method for setting the request's game name
-     * @param gameName The new game name that will be used for the request's game name
-     */
-    public void setGameName(String gameName) {
-        this.gameName = gameName;
-    }
 }

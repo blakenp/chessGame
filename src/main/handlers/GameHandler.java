@@ -9,7 +9,6 @@ import requests.JoinGameRequest;
 import responses.CreateGameResponse;
 import responses.JoinGameResponse;
 import responses.ListGamesResponse;
-import responses.LogoutResponse;
 import services.GameService;
 import spark.Request;
 import spark.Response;
@@ -24,26 +23,17 @@ public class GameHandler {
 
         if (authToken.authToken() == null || authToken.authToken().isEmpty()) {
             response.status(401);
-            CreateGameResponse errorResponse = new CreateGameResponse("Error: unauthorized");
-            errorResponse.setGameID(null);
-
-            return gson.toJson(errorResponse);
+            return gson.toJson(new CreateGameResponse("Error: unauthorized"));
         }
 
         try {
             if (authDAO.get(authToken) == null) {
                 response.status(401);
-                CreateGameResponse errorResponse = new CreateGameResponse("Error: unauthorized");
-                errorResponse.setGameID(null);
-
-                return gson.toJson(errorResponse);
+                return gson.toJson(new CreateGameResponse("Error: unauthorized"));
             }
         } catch (DataAccessException dataAccessException) {
             response.status(401);
-            CreateGameResponse errorResponse = new CreateGameResponse("Error: unauthorized");
-            errorResponse.setGameID(null);
-
-            return gson.toJson(errorResponse);
+            return gson.toJson(new CreateGameResponse("Error: unauthorized"));
         }
 
         CreateGameRequest createGameRequest = gson.fromJson(request.body(), CreateGameRequest.class);

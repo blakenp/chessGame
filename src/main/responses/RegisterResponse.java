@@ -42,29 +42,11 @@ public class RegisterResponse extends ErrorResponse {
     }
 
     /**
-     * A setter method for setting the user's username
-     *
-     * @param username The user's new username
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
      * A getter method for the user's auth token
      *
      * @return The user's auth token
      */
     public String getAuthToken() {
         return authToken;
-    }
-
-    /**
-     * A setter method for setting the user's auth token
-     *
-     * @param authToken The user's new auth token
-     */
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
     }
 }

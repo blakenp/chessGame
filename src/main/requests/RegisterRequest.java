@@ -32,14 +32,6 @@ public class RegisterRequest {
     }
 
     /**
-     * A setter method for setting the registering user's username
-     * @param username The registering user's new username
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
      * A getter method for the registering user's password
      * @return The registering user's password
      */
@@ -48,26 +40,10 @@ public class RegisterRequest {
     }
 
     /**
-     * A setter method for setting the registering user's password
-     * @param password The registering user's new password
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    /**
      * A getter method for the registering user's email
      * @return The registering user's email
      */
     public String getEmail() {
         return email;
-    }
-
-    /**
-     * A setter method for setting the registering user's email
-     * @param email  The registering user's new email
-     */
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

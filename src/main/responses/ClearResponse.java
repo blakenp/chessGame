@@ -28,13 +28,4 @@ public class ClearResponse {
     public String getMessage() {
         return message;
     }
-
-    /**
-     * A setter method for setting the clear response's error message
-     *
-     * @param message The new error message that will be set
-     */
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

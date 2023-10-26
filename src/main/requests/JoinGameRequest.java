@@ -29,26 +29,10 @@ public class JoinGameRequest {
     }
 
     /**
-     * A setter method for setting this request's player's team color
-     * @param playerColor The new player's team color that this request's playerColor will be set to
-     */
-    public void setPlayerColor(ChessGame.TeamColor playerColor) {
-        this.playerColor = playerColor;
-    }
-
-    /**
      * A getter method for this request's game ID
      * @return The game ID
      */
     public int getGameID() {
         return gameID;
-    }
-
-    /**
-     * A setter method for setting this request's game ID
-     * @param gameID The new game ID that this request's gameID will be set to
-     */
-    public void setGameID(int gameID) {
-        this.gameID = gameID;
     }
 }

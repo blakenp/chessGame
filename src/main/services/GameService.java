@@ -11,7 +11,6 @@ import responses.JoinGameResponse;
 import responses.ListGamesResponse;
 
 import java.util.Random;
-import java.util.UUID;
 
 /**
  * Object representation of the service used to make API calls to create games, join games, and get a list of all
@@ -32,30 +31,18 @@ public class GameService {
 
         try {
             if (request.getGameName() == null) {
-                CreateGameResponse errorResponse = new CreateGameResponse("Error: bad request");
-                errorResponse.setGameID(null);
-
-                return errorResponse;
+                return new CreateGameResponse("Error: bad request");
             }
 
             if (gameDAO.get(newGame) != null) {
-                CreateGameResponse errorResponse = new CreateGameResponse("Error: already taken");
-                errorResponse.setGameID(null);
-
-                return errorResponse;
+                return new CreateGameResponse("Error: already taken");
             }
 
             gameDAO.post(newGame);
         } catch (DataAccessException dataAccessException) {
-            CreateGameResponse errorResponse = new CreateGameResponse("Error: an error occurred accessing, creating, deleting, or updating data");
-            errorResponse.setGameID(null);
-
-            return errorResponse;
+            return new CreateGameResponse("Error: an error occurred accessing, creating, deleting, or updating data");
         } catch (Exception exception) {
-            CreateGameResponse errorResponse = new CreateGameResponse("Error: an internal server error has occurred");
-            errorResponse.setGameID(null);
-
-            return errorResponse;
+            return new CreateGameResponse("Error: an internal server error has occurred");
         }
         return new CreateGameResponse(newGame.gameID());
     }

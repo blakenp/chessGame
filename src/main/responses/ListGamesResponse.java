@@ -38,29 +38,11 @@ public class ListGamesResponse {
     }
 
     /**
-     * A setter method for setting the list of games from the database
-     *
-     * @param games The games you want to set the list of games to
-     */
-    public void setGames(Game[] games) {
-        this.games = games;
-    }
-
-    /**
      * A getter method for the error message
      *
      * @return The error message
      */
     public String getMessage() {
         return message;
-    }
-
-    /**
-     * A setter method for setting the error message
-     *
-     * @param message The message the error message will be set to
-     */
-    public void setMessage(String message) {
-        this.message = message;
     }
 }

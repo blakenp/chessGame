@@ -8,7 +8,7 @@ public class CreateGameResponse extends ErrorResponse {
     /**
      * Data field representing a game ID
      */
-    private Integer gameID;
+    private Integer gameID = null;
 
     /**
      * CreateGameResponse object constructor that will set the gameID and message upon instantiation of
@@ -23,7 +23,6 @@ public class CreateGameResponse extends ErrorResponse {
 
     public CreateGameResponse(String message) {
         super(message);
-//        this.gameID = gameID;
     }
 
     /**
@@ -33,14 +32,5 @@ public class CreateGameResponse extends ErrorResponse {
      */
     public Integer getGameID() {
         return gameID;
-    }
-
-    /**
-     * A setter method for setting the response's game ID
-     *
-     * @param gameID The new game ID that will be used for the response's game ID
-     */
-    public void setGameID(Integer gameID) {
-        this.gameID = gameID;
     }
 }
