@@ -44,18 +44,6 @@ public class AuthDAO implements DAO<AuthToken> {
     }
 
     /**
-     * A method that will retrieve all the currently stored auth tokens in the database. For security reasons,
-     * this just throw an exception if someone tries to access it
-     *
-     * @return A list of all the currently stored auth tokens in the database
-     * @throws DataAccessException An exception if an error occurs in accessing the data
-     */
-    @Override
-    public List<AuthToken> getAll() throws DataAccessException {
-        throw new DataAccessException("Error: unauthorized");
-    }
-
-    /**
      * A method that will create a new auth token and put it in the database
      * @param authToken The auth token that is inserted into the database
      * @throws DataAccessException An exception if an error occurs in accessing the data
@@ -66,24 +54,12 @@ public class AuthDAO implements DAO<AuthToken> {
     }
 
     /**
-     * A method that updates a specific auth token in the database. This one will just throw an error
-     * because of security reasons
-     *
-     * @param authToken The auth token in the database that will be updated
-     * @throws DataAccessException An exception if an error occurs in accessing the data
-     */
-    @Override
-    public void put(AuthToken authToken) throws DataAccessException {
-        throw new DataAccessException("Error: unauthorized");
-    }
-
-    /**
      * A method that deletes an auth token stored in the database
      *
      * @param authToken The auth token in the database that will be deleted
      * @throws DataAccessException An exception if an error occurs in accessing the data
      */
-    @Override
+
     public void delete(AuthToken authToken) throws DataAccessException {
         try {
             authTokens.remove(authToken.authToken());

@@ -56,7 +56,7 @@ public class GameDAO implements DAO<Game> {
      * @return A list of all the games stored in the database
      * @throws DataAccessException An exception if an error occurs in accessing the data
      */
-    @Override
+
     public List<Game> getAll() throws DataAccessException {
         List<Game> gamesList = new ArrayList<>();
 
@@ -89,27 +89,13 @@ public class GameDAO implements DAO<Game> {
      * @param game The game in the database that will be updated
      * @throws DataAccessException An exception if an error occurs in accessing the data
      */
-    @Override
+
     public void put(Game game) throws DataAccessException {
         try {
             games.remove(game.gameName());
             games.put(game.gameName(), game);
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to update user");
-        }
-    }
-
-    /**
-     * A method that delete an existing game stored in the database
-     * @param game The game in the database that will be deleted
-     * @throws DataAccessException An exception if an error occurs in accessing the data
-     */
-    @Override
-    public void delete(Game game) throws DataAccessException {
-        try {
-            games.remove(game.gameName());
-        } catch (Exception exception) {
-            throw new DataAccessException("Error: failed to delete game from database");
         }
     }
 

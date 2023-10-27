@@ -44,25 +44,6 @@ public class UserDAO implements DAO<User> {
     }
 
     /**
-     * A method that returns a list of all the users stored in the database
-     * @return A list of all the users stored in the database
-     * @throws DataAccessException An exception if an error occurs in accessing the data
-     */
-    @Override
-    public List<User> getAll() throws DataAccessException {
-        List<User> usersList = new ArrayList<>();
-
-        try {
-            for (User user : users.values()) {
-                usersList.add(user);
-            }
-            return usersList;
-        } catch (Exception exception) {
-            throw new DataAccessException("Error: failed to get all users");
-        }
-    }
-
-    /**
      * A method that create a new user and stores it in the database
      * @param user The user that is inserted into the database
      * @throws DataAccessException An exception if an error occurs in accessing the data
@@ -73,35 +54,6 @@ public class UserDAO implements DAO<User> {
             users.put(user.username(), user);
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to create new user");
-        }
-    }
-
-    /**
-     * A method that updates an existing user's data in the database
-     * @param user The user in the database that will be updated
-     * @throws DataAccessException An exception if an error occurs in accessing the data
-     */
-    @Override
-    public void put(User user) throws DataAccessException {
-        try {
-            users.remove(user.username());
-            users.put(user.username(), user);
-        } catch (Exception exception) {
-            throw new DataAccessException("Error: failed to update user");
-        }
-    }
-
-    /**
-     * A method that deletes an existing user and their data in the database
-     * @param user The user in the database that will be deleted
-     * @throws DataAccessException An exception if an error occurs in accessing the data
-     */
-    @Override
-    public void delete(User user) throws DataAccessException {
-        try {
-            users.remove(user);
-        } catch (Exception exception) {
-            throw new DataAccessException("Error: failed to delete user");
         }
     }
 

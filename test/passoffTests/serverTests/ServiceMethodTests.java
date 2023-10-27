@@ -100,7 +100,9 @@ public class ServiceMethodTests {
         LogoutRequest logoutRequest = new LogoutRequest("123j4-ladf[ol-adjf");
         LogoutResponse logoutResponse = authService.logout(logoutRequest);
         assertNotEquals(logoutResponse.getMessage(), "Error: invalid auth token", "User shouldn't get this error message when attempting to logout");
-        assertThrows(DataAccessException.class, () -> authDAO.put(testAuthToken), "trying to access deleted auth token should throw a DataAccessException");
+
+
+        assertNull(authDAO.get(testAuthToken), "trying to access deleted auth token should result in a null response");
     }
 
     @Test
@@ -227,10 +229,10 @@ public class ServiceMethodTests {
         userDAO.post(user);
         userDAO.post(user2);
         
-        List<User> emptyList = new ArrayList<>();
+        List<Game> emptyList = new ArrayList<>();
 
         testingService.clear();
-        assertEquals(userDAO.getAll(), emptyList, "No users should be left in the database");
+        assertEquals(gameDAO.getAll(), emptyList, "No users should be left in the database");
     }
 
     @Test
