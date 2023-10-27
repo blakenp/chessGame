@@ -4,7 +4,7 @@ package responses;
  * Object representation of the response the client can receive from registering for
  * making a new account for their user.
  */
-public class RegisterResponse extends ErrorResponse {
+public class RegisterResponse extends ResponseMessage {
     /**
      * Data field representing a user's username
      */

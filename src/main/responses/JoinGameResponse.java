@@ -3,7 +3,7 @@ package responses;
 /**
  * Object representation of the response received by the client when making a request to join a chess game session
  */
-public class JoinGameResponse extends ErrorResponse {
+public class JoinGameResponse extends ResponseMessage {
 
     /**
      * JoinResponse object constructor that just sets the error message if the response

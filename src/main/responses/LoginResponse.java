@@ -3,7 +3,7 @@ package responses;
 /**
  * Object representation of the response and possible strings it can send back to the client.
  */
-public class LoginResponse extends ErrorResponse {
+public class LoginResponse extends ResponseMessage {
     /**
      * Data field representing a user's username
      */

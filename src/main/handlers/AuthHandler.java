@@ -33,8 +33,8 @@ public class AuthHandler {
 
         LoginResponse logoutResponse = authService.login(loginRequest);
 
-        if (logoutResponse.getErrorMessage() != null) {
-            switch (logoutResponse.getErrorMessage()) {
+        if (logoutResponse.getMessage() != null) {
+            switch (logoutResponse.getMessage()) {
                 case "Error: user doesn't exist" -> response.status(404);
                 case "Error: invalid auth token" -> response.status(401);
                 case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(401);
@@ -69,8 +69,8 @@ public class AuthHandler {
 
         LogoutResponse logoutResponse = authService.logout(logoutRequest);
 
-        if (logoutResponse.getErrorMessage() != null) {
-            switch (logoutResponse.getErrorMessage()) {
+        if (logoutResponse.getMessage() != null) {
+            switch (logoutResponse.getMessage()) {
                 case "Error: invalid auth token" -> response.status(401);
                 case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(500);
                 case "Error: an internal server error has occurred" -> response.status(500);

@@ -42,8 +42,8 @@ public class GameHandler {
 
         CreateGameResponse createGameResponse = gameService.createGame(createGameRequest);
 
-        if (createGameResponse.getErrorMessage() != null) {
-            switch (createGameResponse.getErrorMessage()) {
+        if (createGameResponse.getMessage() != null) {
+            switch (createGameResponse.getMessage()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: unauthorized" -> response.status(401);
                 case "Error: already taken" -> response.status(403);
@@ -77,8 +77,8 @@ public class GameHandler {
 
         JoinGameResponse joinGameResponse = gameService.joinGame(joinGameRequest);
 
-        if (joinGameResponse.getErrorMessage() != null) {
-            switch (joinGameResponse.getErrorMessage()) {
+        if (joinGameResponse.getMessage() != null) {
+            switch (joinGameResponse.getMessage()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: unauthorized" -> response.status(401);
                 case "Error: already taken" -> response.status(403);
@@ -111,8 +111,8 @@ public class GameHandler {
 
         ListGamesResponse listGamesResponse = gameService.listGames(listGamesRequest);
 
-        if (listGamesResponse.getErrorMessage() != null) {
-            switch (listGamesResponse.getErrorMessage()) {
+        if (listGamesResponse.getMessage() != null) {
+            switch (listGamesResponse.getMessage()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: unauthorized" -> response.status(401);
                 case "Error: already taken" -> response.status(403);

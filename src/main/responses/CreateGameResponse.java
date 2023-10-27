@@ -4,7 +4,7 @@ package responses;
  * Object representation of the response that can be received by the client when they request
  * to create a chess game session. Can return a game ID or an error message
  */
-public class CreateGameResponse extends ErrorResponse {
+public class CreateGameResponse extends ResponseMessage {
     /**
      * Data field representing a game ID
      */

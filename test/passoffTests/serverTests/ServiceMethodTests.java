@@ -61,9 +61,9 @@ public class ServiceMethodTests {
     public void negativeRegister() {
         RegisterRequest registerRequest = new RegisterRequest("Jack", "Ripper", null);
         RegisterResponse registerResponse = userService.register(registerRequest);
-        assertTrue(registerResponse.getErrorMessage() != null && registerResponse.getErrorMessage().startsWith("Error"),
+        assertTrue(registerResponse.getMessage() != null && registerResponse.getMessage().startsWith("Error"),
                 "register method on userService should return an error message due to the null email field");
-        assertEquals(registerResponse.getErrorMessage(), "Error: bad request", "auth token was not null and was successfully returned");
+        assertEquals(registerResponse.getMessage(), "Error: bad request", "auth token was not null and was successfully returned");
     }
 
     @Test
@@ -74,7 +74,7 @@ public class ServiceMethodTests {
 
         LoginRequest loginRequest = new LoginRequest("Josuke", "Hikaru");
         LoginResponse loginResponse = authService.login(loginRequest);
-        assertNull(loginResponse.getErrorMessage(), "User should have been able to successfully login since their credentials are stored in the users table");
+        assertNull(loginResponse.getMessage(), "User should have been able to successfully login since their credentials are stored in the users table");
         assertNotNull(loginResponse.getAuthToken(), "make sure auth token is not null and an auth token was returned in response");
     }
 
@@ -86,8 +86,8 @@ public class ServiceMethodTests {
 
         LoginRequest loginRequest = new LoginRequest("Mario", "Peach");
         LoginResponse loginResponse = authService.login(loginRequest);
-        assertNotNull(loginResponse.getErrorMessage(), "passwords don't match, so an error should have been thrown");
-        assertEquals(loginResponse.getErrorMessage(),"Error: unauthorized" , "make sure correct error message is returned");
+        assertNotNull(loginResponse.getMessage(), "passwords don't match, so an error should have been thrown");
+        assertEquals(loginResponse.getMessage(),"Error: unauthorized" , "make sure correct error message is returned");
     }
 
     @Test
@@ -98,7 +98,7 @@ public class ServiceMethodTests {
 
         LogoutRequest logoutRequest = new LogoutRequest("123j4-ladf[ol-adjf");
         LogoutResponse logoutResponse = authService.logout(logoutRequest);
-        assertNotEquals(logoutResponse.getErrorMessage(), "Error: invalid auth token", "User shouldn't get this error message when attempting to logout");
+        assertNotEquals(logoutResponse.getMessage(), "Error: invalid auth token", "User shouldn't get this error message when attempting to logout");
         assertThrows(DataAccessException.class, () -> authDAO.put(testAuthToken), "trying to access deleted auth token should throw a DataAccessException");
     }
 
@@ -110,7 +110,7 @@ public class ServiceMethodTests {
 
         LogoutRequest logoutRequest = new LogoutRequest("123j4-ladf[ol-adjf");
         LogoutResponse logoutResponse = authService.logout(logoutRequest);
-        assertEquals(logoutResponse.getErrorMessage(), "Error: invalid auth token", "User should get this error message when attempting to logout");
+        assertEquals(logoutResponse.getMessage(), "Error: invalid auth token", "User should get this error message when attempting to logout");
         assertNotNull(authDAO.get(testAuthToken), "should still be able to access stored auth token since it wasn't deleted");
     }
 
@@ -122,7 +122,7 @@ public class ServiceMethodTests {
 
         CreateGameRequest createGameRequest = new CreateGameRequest("mushroom kingdom", "123j4-ladf[ol-adjf");
         CreateGameResponse createGameResponse = gameService.createGame(createGameRequest);
-        assertNull(createGameResponse.getErrorMessage(), "no error message should be thrown");
+        assertNull(createGameResponse.getMessage(), "no error message should be thrown");
     }
 
     @Test
@@ -136,7 +136,7 @@ public class ServiceMethodTests {
 
         CreateGameRequest createGameRequest = new CreateGameRequest("mushroom kingdom", "123j4-ladf[ol-adjf");
         CreateGameResponse createGameResponse = gameService.createGame(createGameRequest);
-        assertNotNull(createGameResponse.getErrorMessage(), "error message should be thrown");
+        assertNotNull(createGameResponse.getMessage(), "error message should be thrown");
         assertSame(gameDAO.get(game), game, "original game is still in database");
     }
 
@@ -173,7 +173,7 @@ public class ServiceMethodTests {
 
         JoinGameRequest joinGameRequest = new JoinGameRequest(ChessGame.TeamColor.WHITE,123, testAuthToken.authToken());
         JoinGameResponse joinGameResponse = gameService.joinGame(joinGameRequest);
-        assertEquals(joinGameResponse.getErrorMessage(), "Error: already taken", "error is thrown because white team player name is already taken");
+        assertEquals(joinGameResponse.getMessage(), "Error: already taken", "error is thrown because white team player name is already taken");
     }
 
     @Test
@@ -207,7 +207,7 @@ public class ServiceMethodTests {
 
         ListGamesRequest listGamesRequest = new ListGamesRequest("adleqwurfdslkn");
         ListGamesResponse listGamesResponse = gameService.listGames(listGamesRequest);
-        assertEquals(listGamesResponse.getErrorMessage(), "Error: unauthorized", "should throw error due to invalid auth token");
+        assertEquals(listGamesResponse.getMessage(), "Error: unauthorized", "should throw error due to invalid auth token");
     }
 
     @Test

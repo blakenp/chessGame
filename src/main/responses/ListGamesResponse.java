@@ -8,7 +8,7 @@ import java.util.List;
  * Object representation of the response you can get when requesting a list of all the chess games
  * in the database.
  */
-public class ListGamesResponse extends ErrorResponse {
+public class ListGamesResponse extends ResponseMessage {
     /**
      * Data field representing a list of chess games
      */
