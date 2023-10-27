@@ -15,6 +15,12 @@ public class UserDAO implements DAO<User> {
     private static UserDAO instance = null;
     private Map<String, User> users = new HashMap<>();
 
+    /**
+     * Singleton design to make sure just one instance of this class is used in the api endpoints
+     * and that you only ever use this instance
+     *
+     * @return The same instance of this class
+     */
     public static UserDAO getInstance() {
         if (instance == null) {
             instance = new UserDAO();
@@ -99,6 +105,12 @@ public class UserDAO implements DAO<User> {
         }
     }
 
+    /**
+     * Method for clearing the auth tokens from the database
+     *
+     * @throws DataAccessException An exception if an error occurs in deleting the data
+     */
+    @Override
     public void deleteAll() throws DataAccessException {
         try {
             users.clear();

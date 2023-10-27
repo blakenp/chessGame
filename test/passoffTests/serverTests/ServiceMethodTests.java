@@ -17,6 +17,7 @@ import services.GameService;
 import services.TestingService;
 import services.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -225,9 +226,11 @@ public class ServiceMethodTests {
         User user2 = new User("Luigi", "Mario", "luigi@gmail.com");
         userDAO.post(user);
         userDAO.post(user2);
+        
+        List<User> emptyList = new ArrayList<>();
 
         testingService.clear();
-        assertThrows(DataAccessException.class, () -> authDAO.put(testAuthToken), "throw exception because all auth tokens were deleted");
+        assertEquals(userDAO.getAll(), emptyList, "No users should be left in the database");
     }
 
     @Test

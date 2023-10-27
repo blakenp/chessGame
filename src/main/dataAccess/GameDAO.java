@@ -15,6 +15,12 @@ public class GameDAO implements DAO<Game> {
     private static GameDAO instance = null;
     private Map<String, Game> games = new HashMap<>();
 
+    /**
+     * Singleton design to make sure just one instance of this class is used in the api endpoints
+     * and that you only ever use this instance
+     *
+     * @return The same instance of this class
+     */
     public static GameDAO getInstance() {
         if (instance == null) {
             instance = new GameDAO();
@@ -107,6 +113,12 @@ public class GameDAO implements DAO<Game> {
         }
     }
 
+    /**
+     * Method for clearing the auth tokens from the database
+     *
+     * @throws DataAccessException An exception if an error occurs in deleting the data
+     */
+    @Override
     public void deleteAll() throws DataAccessException {
         try {
             games.clear();

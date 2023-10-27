@@ -47,4 +47,6 @@ public interface DAO<T> {
      * @throws DataAccessException An exception if an error occurs in accessing the data
      */
     void delete(T object) throws DataAccessException;
+
+    void deleteAll() throws DataAccessException;
 }

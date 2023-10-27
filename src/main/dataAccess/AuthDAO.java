@@ -15,6 +15,12 @@ public class AuthDAO implements DAO<AuthToken> {
     private static AuthDAO instance = null;
     private Map<String, AuthToken> authTokens = new HashMap<>();
 
+    /**
+     * Singleton design to make sure just one instance of this class is used in the api endpoints
+     * and that you only ever use this instance
+     *
+     * @return The same instance of this class
+     */
     public static AuthDAO getInstance() {
         if (instance == null) {
             instance = new AuthDAO();
@@ -60,7 +66,9 @@ public class AuthDAO implements DAO<AuthToken> {
     }
 
     /**
-     * A method that updates a specific auth token in the database
+     * A method that updates a specific auth token in the database. This one will just throw an error
+     * because of security reasons
+     *
      * @param authToken The auth token in the database that will be updated
      * @throws DataAccessException An exception if an error occurs in accessing the data
      */
@@ -71,6 +79,7 @@ public class AuthDAO implements DAO<AuthToken> {
 
     /**
      * A method that deletes an auth token stored in the database
+     *
      * @param authToken The auth token in the database that will be deleted
      * @throws DataAccessException An exception if an error occurs in accessing the data
      */
@@ -83,6 +92,12 @@ public class AuthDAO implements DAO<AuthToken> {
         }
     }
 
+    /**
+     * Method for clearing the auth tokens from the database
+     *
+     * @throws DataAccessException An exception if an error occurs in deleting the data
+     */
+    @Override
     public void deleteAll() throws DataAccessException {
         try {
             authTokens.clear();
