@@ -27,10 +27,12 @@ public class UserService {
         AuthToken authToken = new AuthToken(newUser.username(), UUID.randomUUID().toString());
 
         try {
+            // If not all required fields were sent by the client, throw an error
             if ((request.username() == null) || (request.password() == null) || (request.email() == null)) {
                 return new RegisterResponse("Error: bad request");
             }
 
+            // If the client requested a username that is already taken, throw an error
             if (userDAO.get(newUser) != null) {
                 return new RegisterResponse("Error: already taken");
             }

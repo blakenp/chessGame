@@ -1,5 +1,8 @@
 package responses;
 
+/**
+ * Object representation/abstract class of error responses any type of response can throw
+ */
 public class ErrorResponse {
 
     private final String message;

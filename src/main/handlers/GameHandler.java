@@ -12,10 +12,23 @@ import services.GameService;
 import spark.Request;
 import spark.Response;
 
+/**
+ * Object representation of a http handler for handling requests to create, join, and fetch games in the database
+ */
 public class GameHandler {
-    private static AuthDAO authDAO = AuthDAO.getInstance();
+
+    /**
+     * service used to perform game related actions in the chess server
+     */
     private static GameService gameService = new GameService();
 
+    /**
+     * Method that handles client's request to create a new chess game
+     *
+     * @param request Client's request
+     * @param response Handlers response (either successful or negative)
+     * @return Returns the server's response after handling the client's request in form of CreateGameResponse object
+     */
     public static String handleCreateGame(Request request, Response response) {
         Gson gson = new Gson();
         String authToken = request.headers("Authorization");
@@ -42,6 +55,13 @@ public class GameHandler {
         return gson.toJson(createGameResponse);
     }
 
+    /**
+     * Method for handling client's request to join a chess game
+     *
+     * @param request Client's request
+     * @param response Server's response
+     * @return Returns server's response to client's request in form of joinGameResponse object
+     */
     public static String handleJoinGame(Request request, Response response) {
         Gson gson = new Gson();
         String authToken = request.headers("Authorization");
@@ -71,6 +91,13 @@ public class GameHandler {
         return gson.toJson(joinGameResponse);
     }
 
+    /**
+     * Method that handles client's request to fetch all chess games stored in database
+     *
+     * @param request Client's request
+     * @param response Server's response
+     * @return Returns the server's response after handling client's request in form of ListGamesResponse object
+     */
     public static String handleListGames(Request request, Response response) {
         Gson gson = new Gson();
         String authToken = request.headers("Authorization");

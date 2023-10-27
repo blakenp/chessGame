@@ -6,10 +6,21 @@ import services.TestingService;
 import spark.Request;
 import spark.Response;
 
+/**
+ * Object representation of http handler used to handle requests to clear database for testing purposes
+ */
 public class TestingHandler {
+    /**
+     * service called by handler to perform clearing of database
+     */
     private static TestingService testingService = new TestingService();
 
-    public static String handleClear(Request request, Response response) {
+    /**
+     * Method that clears all data stored in database
+     *
+     * @return Returns response of clearing data in form of ClearResponse object
+     */
+    public static String handleClear() {
         Gson gson = new Gson();
 
         ClearResponse clearResponse = testingService.clear();

@@ -19,7 +19,7 @@ public class Server {
         createRoutes();
 
         Spark.delete("/db", (request, response) ->
-            TestingHandler.handleClear(request, response)
+            TestingHandler.handleClear()
         );
 
         Spark.post("/user", (request, response) ->

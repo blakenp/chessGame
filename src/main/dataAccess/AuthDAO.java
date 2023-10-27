@@ -38,8 +38,8 @@ public class AuthDAO implements DAO<AuthToken> {
     }
 
     /**
-     * A method that will retrieve all the currently stored auth tokens in the database. I may make this always
-     * throw a DataAccessException just for security reasons though
+     * A method that will retrieve all the currently stored auth tokens in the database. For security reasons,
+     * this just throw an exception if someone tries to access it
      *
      * @return A list of all the currently stored auth tokens in the database
      * @throws DataAccessException An exception if an error occurs in accessing the data

@@ -40,14 +40,17 @@ public class GameService {
         Game newGame = new Game(randomGameID, null, null, request.gameName(), new ChessGameImpl());
 
         try {
+            // if the client didn't send a game name in the request, throw an error
             if (request.gameName() == null) {
                 return new CreateGameResponse("Error: bad request");
             }
 
+            // if the client's request includes a game name that is already taken, throw an error
             if (gameDAO.get(newGame) != null) {
                 return new CreateGameResponse("Error: already taken");
             }
 
+            // if the auth token the client sent to the server is not already stored in the server, throw an error
             if (authDAO.get(authToken) == null) {
                 return new CreateGameResponse("Error: unauthorized");
             }
@@ -86,10 +89,12 @@ public class GameService {
             storedGame = gameDAO.get(storedGame);
             Game updatedGame;
 
+            // just join as an observer if no team color was specified
             if (request.playerColor() == null) {
                 return new JoinGameResponse("Successful Join as Observer");
             }
 
+            // join as white or black team player if those options are still not taken. Else, throw an error
             if (request.playerColor() == ChessGame.TeamColor.WHITE && storedGame.whiteUsername() == null) {
                 updatedGame = new Game(storedGame.gameID(), user.username(), storedGame.blackUsername(), storedGame.gameName(), storedGame.game());
             }

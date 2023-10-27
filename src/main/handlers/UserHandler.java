@@ -7,10 +7,24 @@ import services.UserService;
 import spark.Request;
 import spark.Response;
 
+/**
+ * Object representation of http handler used to handle client's requests to register a new account in the chess
+ * game server
+ */
 public class UserHandler {
 
+    /**
+     * service used to perform user creation related actions
+     */
     private static UserService userService = new UserService();
 
+    /**
+     * Method that registers new users and creates an account for them
+     *
+     * @param request Client's request
+     * @param response Server's response
+     * @return Returns server's response to client's request to create new account in form of RegisterResponse object
+     */
     public static String handleRegisterUser(Request request, Response response) {
         Gson gson = new Gson();
         RegisterRequest registerRequest = gson.fromJson(request.body(), RegisterRequest.class);
