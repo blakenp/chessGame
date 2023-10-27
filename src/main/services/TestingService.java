@@ -27,6 +27,6 @@ public class TestingService {
         } catch (Exception exception) {
             return new ClearResponse("Error: Internal Server Error");
         }
-        return new ClearResponse("");
+        return new ClearResponse("Successful clear");
     }
 }

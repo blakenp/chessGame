@@ -62,7 +62,7 @@ public class AuthService {
      * @return This will return either null and a successful 200 status code for logging the user out or a LogoutResponse with an error message
      */
     public LogoutResponse logout(LogoutRequest request) {
-        AuthToken authToken = new AuthToken("", request.authToken());
+        AuthToken authToken = new AuthToken(null, request.authToken());
 
         try {
 

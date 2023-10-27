@@ -16,9 +16,7 @@ import responses.CreateGameResponse;
 import responses.JoinGameResponse;
 import responses.ListGamesResponse;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -119,7 +117,6 @@ public class GameService {
         List<Game> games;
 
         try {
-
             if (authDAO.get(authToken) == null) {
                 return new ListGamesResponse("Error: unauthorized");
             }
