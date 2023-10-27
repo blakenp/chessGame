@@ -43,7 +43,6 @@ public class AuthHandler {
             }
         }
 
-        System.out.println(gson.toJson(logoutResponse));
         return gson.toJson(logoutResponse);
     }
 
@@ -77,7 +76,6 @@ public class AuthHandler {
             }
         }
 
-        System.out.println(gson.toJson(logoutResponse));
         return gson.toJson(logoutResponse);
     }
 }
