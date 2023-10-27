@@ -4,45 +4,25 @@ import chess.ChessGame;
 
 /**
  * Object representation of a game with an id that can be used as a room to host online chess games
+ *
+ * @param gameID        Data field representing a game's ID
+ * @param whiteUsername Data field representing a game's white team player's username
+ * @param blackUsername Data field representing a game's black team player's username
+ * @param gameName      Data field representing a game's name
+ * @param game          Data field representing the chess game of the Game object
  */
-public class Game {
-    /**
-     * Data field representing a game's ID
-     */
-    private int gameID;
-    /**
-     * Data field representing a game's white team player's username
-     */
-    private String whiteUsername;
-    /**
-     * Data field representing a game's black team player's username
-     */
-    private String blackUsername;
-    /**
-     * Data field representing a game's name
-     */
-    private String gameName;
-    /**
-     * Data field representing the chess game of the Game object
-     */
-    private ChessGame game;
-
+public record Game(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
     /**
      * Game object constructor that will have a game ID and the usernames of the players playing, the name of the game,
      * and the object representing the chess game with its board itself
      *
-     * @param gameID
-     * @param whiteUsername
-     * @param blackUsername
-     * @param gameName
-     * @param game
+     * @param gameID The game's ID
+     * @param whiteUsername The game's white team player's username
+     * @param blackUsername The game's black team player's username
+     * @param gameName The game's name
+     * @param game The game's game object
      */
-    public Game(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
-        this.gameID = gameID;
-        this.whiteUsername = whiteUsername;
-        this.blackUsername = blackUsername;
-        this.gameName = gameName;
-        this.game = game;
+    public Game {
     }
 
     /**
@@ -50,17 +30,9 @@ public class Game {
      *
      * @return The game's ID
      */
-    public int getGameID() {
+    @Override
+    public int gameID() {
         return gameID;
-    }
-
-    /**
-     * A setter method for setting the game's ID
-     *
-     * @param gameID The game's new game ID
-     */
-    public void setGameID(int gameID) {
-        this.gameID = gameID;
     }
 
     /**
@@ -68,17 +40,9 @@ public class Game {
      *
      * @return The game's white team player name
      */
-    public String getWhiteUsername() {
+    @Override
+    public String whiteUsername() {
         return whiteUsername;
-    }
-
-    /**
-     * A setter method for setting the username of the game's white team player
-     *
-     * @param whiteUsername The new username for the game's white team player
-     */
-    public void setWhiteUsername(String whiteUsername) {
-        this.whiteUsername = whiteUsername;
     }
 
     /**
@@ -86,17 +50,9 @@ public class Game {
      *
      * @return The game's black team player name
      */
-    public String getBlackUsername() {
+    @Override
+    public String blackUsername() {
         return blackUsername;
-    }
-
-    /**
-     * A setter method for setting the username of the game's black team player
-     *
-     * @param blackUsername The new username for the game's black team player
-     */
-    public void setBlackUsername(String blackUsername) {
-        this.blackUsername = blackUsername;
     }
 
     /**
@@ -104,17 +60,9 @@ public class Game {
      *
      * @return The game's name
      */
-    public String getGameName() {
+    @Override
+    public String gameName() {
         return gameName;
-    }
-
-    /**
-     * A setter method for setting the game's name
-     *
-     * @param gameName The game's new name
-     */
-    public void setGameName(String gameName) {
-        this.gameName = gameName;
     }
 
     /**
@@ -122,16 +70,8 @@ public class Game {
      *
      * @return The game's chess game object
      */
-    public ChessGame getGame() {
+    @Override
+    public ChessGame game() {
         return game;
-    }
-
-    /**
-     * A setter method for setting the game's chess game object
-     *
-     * @param game The game's new chess game object
-     */
-    public void setGame(ChessGame game) {
-        this.game = game;
     }
 }

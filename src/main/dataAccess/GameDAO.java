@@ -2,12 +2,31 @@ package dataAccess;
 
 import models.Game;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Object representation of the data access object used to store and fetch data relating to chess games in the database
  */
 public class GameDAO implements DAO<Game> {
+
+    private static GameDAO instance = null;
+    private Map<String, Game> games = new HashMap<>();
+
+    /**
+     * Singleton design to make sure just one instance of this class is used in the api endpoints
+     * and that you only ever use this instance
+     *
+     * @return The same instance of this class
+     */
+    public static GameDAO getInstance() {
+        if (instance == null) {
+            instance = new GameDAO();
+        }
+        return instance;
+    }
 
     /**
      * A method that queries the database for a game and returns it if it is found in the database
@@ -17,7 +36,19 @@ public class GameDAO implements DAO<Game> {
      */
     @Override
     public Game get(Game game) throws DataAccessException {
-        return null;
+        try {
+            if (game.gameName() == null) {
+                for (Game gameObject : games.values()) {
+                    if (gameObject.gameID() == game.gameID()) {
+                        return  gameObject;
+                    }
+                }
+                return null;
+            }
+            return games.get(game.gameName());
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to get a game from the database");
+        }
     }
 
     /**
@@ -25,9 +56,18 @@ public class GameDAO implements DAO<Game> {
      * @return A list of all the games stored in the database
      * @throws DataAccessException An exception if an error occurs in accessing the data
      */
-    @Override
+
     public List<Game> getAll() throws DataAccessException {
-        return null;
+        List<Game> gamesList = new ArrayList<>();
+
+        try {
+            for (Game game : games.values()) {
+                gamesList.add(game);
+            }
+            return gamesList;
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to get all users");
+        }
     }
 
     /**
@@ -37,7 +77,11 @@ public class GameDAO implements DAO<Game> {
      */
     @Override
     public void post(Game game) throws DataAccessException {
-
+        try {
+            games.put(game.gameName(), game);
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to add new game to database");
+        }
     }
 
     /**
@@ -45,18 +89,27 @@ public class GameDAO implements DAO<Game> {
      * @param game The game in the database that will be updated
      * @throws DataAccessException An exception if an error occurs in accessing the data
      */
-    @Override
-    public void put(Game game) throws DataAccessException {
 
+    public void put(Game game) throws DataAccessException {
+        try {
+            games.remove(game.gameName());
+            games.put(game.gameName(), game);
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to update user");
+        }
     }
 
     /**
-     * A method that delete an existing game stored in the database
-     * @param game The game in the database that will be deleted
-     * @throws DataAccessException An exception if an error occurs in accessing the data
+     * Method for clearing the auth tokens from the database
+     *
+     * @throws DataAccessException An exception if an error occurs in deleting the data
      */
     @Override
-    public void delete(Game game) throws DataAccessException {
-
+    public void deleteAll() throws DataAccessException {
+        try {
+            games.clear();
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to clear games from database");
+        }
     }
 }

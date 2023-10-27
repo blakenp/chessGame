@@ -2,26 +2,18 @@ package models;
 
 /**
  * Object representation of an auth token used to authenticate web API calls after a user has logged in
+ *
+ * @param username  Data field representing a user's username
+ * @param authToken Data field representing the actual auth token for the AuthToken object
  */
-public class AuthToken {
-    /**
-     * Data field representing a user's username
-     */
-    private final String username;
-    /**
-     * Data field representing the actual auth token for the AuthToken object
-     */
-    private final String authToken;
-
+public record AuthToken(String username, String authToken) {
     /**
      * AuthToken object constructor that takes in a username and auth token to instantiate
      *
-     * @param username The username of the user the auth token is associated with
+     * @param username  The username of the user the auth token is associated with
      * @param authToken The auth token the user can use to make web API calls
      */
-    public AuthToken(String username, String authToken) {
-        this.username = username;
-        this.authToken = authToken;
+    public AuthToken {
     }
 
     /**
@@ -29,7 +21,8 @@ public class AuthToken {
      *
      * @return The associated user's username
      */
-    public String getUsername() {
+    @Override
+    public String username() {
         return username;
     }
 
@@ -38,7 +31,8 @@ public class AuthToken {
      *
      * @return The auth token
      */
-    public String getAuthToken() {
+    @Override
+    public String authToken() {
         return authToken;
     }
 }

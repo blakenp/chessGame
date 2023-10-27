@@ -2,12 +2,31 @@ package dataAccess;
 
 import models.User;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Object representation of the data access object used to store and fetch the data related to users in the database
  */
 public class UserDAO implements DAO<User> {
+
+    private static UserDAO instance = null;
+    private Map<String, User> users = new HashMap<>();
+
+    /**
+     * Singleton design to make sure just one instance of this class is used in the api endpoints
+     * and that you only ever use this instance
+     *
+     * @return The same instance of this class
+     */
+    public static UserDAO getInstance() {
+        if (instance == null) {
+            instance = new UserDAO();
+        }
+        return instance;
+    }
 
     /**
      * A method that queries the database for a user and returns it if it is found in the database
@@ -17,17 +36,11 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public User get(User user) throws DataAccessException {
-        return null;
-    }
-
-    /**
-     * A method that returns a list of all the users stored in the database
-     * @return A list of all the users stored in the database
-     * @throws DataAccessException An exception if an error occurs in accessing the data
-     */
-    @Override
-    public List<User> getAll() throws DataAccessException {
-        return null;
+        try {
+            return users.get(user.username());
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to get user data");
+        }
     }
 
     /**
@@ -37,26 +50,24 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public void post(User user) throws DataAccessException {
-
+        try {
+            users.put(user.username(), user);
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to create new user");
+        }
     }
 
     /**
-     * A method that updates an existing user's data in the database
-     * @param user The user in the database that will be updated
-     * @throws DataAccessException An exception if an error occurs in accessing the data
+     * Method for clearing the auth tokens from the database
+     *
+     * @throws DataAccessException An exception if an error occurs in deleting the data
      */
     @Override
-    public void put(User user) throws DataAccessException {
-
-    }
-
-    /**
-     * A method that deletes an existing user and their data in the database
-     * @param user The user in the database that will be deleted
-     * @throws DataAccessException An exception if an error occurs in accessing the data
-     */
-    @Override
-    public void delete(User user) throws DataAccessException {
-
+    public void deleteAll() throws DataAccessException {
+        try {
+            users.clear();
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to clear users from database");
+        }
     }
 }
