@@ -51,7 +51,6 @@ public class GameHandler {
             }
         }
 
-        System.out.println(gson.toJson(createGameResponse));
         return gson.toJson(createGameResponse);
     }
 
@@ -87,7 +86,6 @@ public class GameHandler {
             }
         }
 
-        System.out.println(gson.toJson(joinGameResponse));
         return gson.toJson(joinGameResponse);
     }
 
@@ -121,7 +119,6 @@ public class GameHandler {
             }
         }
 
-        System.out.println(gson.toJson(listGamesResponse));
         return gson.toJson(listGamesResponse);
     }
 }

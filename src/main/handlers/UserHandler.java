@@ -40,7 +40,6 @@ public class UserHandler {
             }
         }
 
-        System.out.println(gson.toJson(registerResponse));
         return gson.toJson(registerResponse);
     }
 }

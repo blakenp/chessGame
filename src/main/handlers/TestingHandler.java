@@ -3,8 +3,6 @@ package handlers;
 import com.google.gson.Gson;
 import responses.ClearResponse;
 import services.TestingService;
-import spark.Request;
-import spark.Response;
 
 /**
  * Object representation of http handler used to handle requests to clear database for testing purposes
