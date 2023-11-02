@@ -2,6 +2,7 @@ package server;
 
 import spark.Spark;
 import handlers.*;
+import dataAccess.Database;
 
 /**
  * Object representation of the chess game server that handles client requests and helps

@@ -2,6 +2,7 @@ package dataAccess;
 
 import models.User;
 
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,8 +49,20 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public void post(User user) throws DataAccessException {
-        try {
-            users.put(user.username(), user);
+        var database = new Database();
+
+        try (var connection = database.getConnection()) {
+            String sql = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
+
+            try (var preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, user.username());
+                preparedStatement.setString(2, user.password());
+                preparedStatement.setString(3, user.email());
+
+                preparedStatement.executeUpdate();
+            }
+
+//            users.put(user.username(), user);
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to create new user");
         }

@@ -2,6 +2,7 @@ package dataAccess;
 
 import models.AuthToken;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,10 @@ import java.util.Map;
  * authentication of users for the chess game app
  */
 public class AuthDAO implements DAO<AuthToken> {
+
+//    public AuthDAO(Connection dbConnection) {
+//        this.dbConnection = dbConnection;
+//    }
 
     private static AuthDAO instance = null;
     private Map<String, AuthToken> authTokens = new HashMap<>();
@@ -35,6 +40,11 @@ public class AuthDAO implements DAO<AuthToken> {
      */
     @Override
     public AuthToken get(AuthToken authToken) throws DataAccessException {
+        var database = new Database();
+        var connection = database.getConnection();
+
+        var preparedStatement = "";
+
         try {
             return authTokens.get(authToken.authToken());
         } catch (Exception exception) {
@@ -49,6 +59,10 @@ public class AuthDAO implements DAO<AuthToken> {
      */
     @Override
     public void post(AuthToken authToken) throws DataAccessException {
+        var database = new Database();
+        var connection = database.getConnection();
+
+        var preparedStatement = "";
         authTokens.put(authToken.authToken(), authToken);
     }
 
