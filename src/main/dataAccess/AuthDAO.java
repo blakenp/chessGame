@@ -1,11 +1,6 @@
 package dataAccess;
 
 import models.AuthToken;
-import models.User;
-
-import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Object representation of the data access object that will be used to store and fetch data relating to the
@@ -13,12 +8,7 @@ import java.util.Map;
  */
 public class AuthDAO implements DAO<AuthToken> {
 
-//    public AuthDAO(Connection dbConnection) {
-//        this.dbConnection = dbConnection;
-//    }
-
     private static AuthDAO instance = null;
-    private Map<String, AuthToken> authTokens = new HashMap<>();
 
     /**
      * Singleton design to make sure just one instance of this class is used in the api endpoints

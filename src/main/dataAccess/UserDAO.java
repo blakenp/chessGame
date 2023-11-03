@@ -2,17 +2,12 @@ package dataAccess;
 
 import models.User;
 
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Object representation of the data access object used to store and fetch the data related to users in the database
  */
 public class UserDAO implements DAO<User> {
 
     private static UserDAO instance = null;
-    private Map<String, User> users = new HashMap<>();
 
     /**
      * Singleton design to make sure just one instance of this class is used in the api endpoints

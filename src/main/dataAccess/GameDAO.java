@@ -2,12 +2,9 @@ package dataAccess;
 
 import chessImplementation.ChessGameImpl;
 import models.Game;
-import models.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Object representation of the data access object used to store and fetch data relating to chess games in the database
@@ -15,7 +12,6 @@ import java.util.Map;
 public class GameDAO implements DAO<Game> {
 
     private static GameDAO instance = null;
-    private Map<String, Game> games = new HashMap<>();
 
     /**
      * Singleton design to make sure just one instance of this class is used in the api endpoints
