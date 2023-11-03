@@ -35,8 +35,25 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public User get(User user) throws DataAccessException {
-        try {
-            return users.get(user.username());
+        var database = new Database();
+
+        try (var connection = database.getConnection()) {
+            String sql = "SELECT username, password, email FROM user WHERE username = ?";
+
+            try (var preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, user.username());
+
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        var username = resultSet.getString("username");
+                        var password = resultSet.getString("password");
+                        var email = resultSet.getString("email");
+
+                        return new User(username, password, email);
+                    }
+                }
+            }
+            throw new DataAccessException("Error: User not found in database");
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to get user data");
         }
@@ -52,6 +69,18 @@ public class UserDAO implements DAO<User> {
         var database = new Database();
 
         try (var connection = database.getConnection()) {
+            // check if the user already exists in the database. If they do, then an exception will be thrown
+            try (var preparedStatement = connection.prepareStatement("SELECT username, password, email FROM user WHERE username=?")) {
+                preparedStatement.setString(1, user.username());
+
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    // if the query returned any result, throw an error
+                    if (resultSet.next()) {
+                        throw new DataAccessException("Error: username already taken");
+                    }
+                }
+            }
+
             String sql = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
 
             try (var preparedStatement = connection.prepareStatement(sql)) {
@@ -61,8 +90,6 @@ public class UserDAO implements DAO<User> {
 
                 preparedStatement.executeUpdate();
             }
-
-//            users.put(user.username(), user);
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to create new user");
         }
@@ -75,8 +102,14 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public void deleteAll() throws DataAccessException {
-        try {
-            users.clear();
+        var database = new Database();
+
+        try (var connection = database.getConnection()) {
+            String sql = "DELETE FROM user;";
+
+            try (var preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.executeUpdate();
+            }
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to clear users from database");
         }
