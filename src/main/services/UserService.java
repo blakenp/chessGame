@@ -32,11 +32,6 @@ public class UserService {
                 return new RegisterResponse("Error: bad request");
             }
 
-            // If the client requested a username that is already taken, throw an error
-//            if (userDAO.get(newUser) != null) {
-//                return new RegisterResponse("Error: already taken");
-//            }
-
             userDAO.post(newUser);
             authDAO.post(authToken);
         } catch (DataAccessException dataAccessException) {
