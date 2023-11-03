@@ -41,11 +41,6 @@ public class AuthService {
                 return new LoginResponse("Error: user doesn't exist");
             }
 
-            // if auth token is already stored in the database, then throw an error
-            if (authDAO.get(authToken) != null) {
-                return new LoginResponse("Error: invalid auth token");
-            }
-
             // if password received by client doesn't match stored password for that client, throw an error
             if (!Objects.equals(user.password(), request.password())) {
                 return new LoginResponse("Error: unauthorized");

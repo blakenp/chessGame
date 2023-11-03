@@ -1,6 +1,7 @@
 package dataAccess;
 
 import models.AuthToken;
+import models.User;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -41,14 +42,26 @@ public class AuthDAO implements DAO<AuthToken> {
     @Override
     public AuthToken get(AuthToken authToken) throws DataAccessException {
         var database = new Database();
-        var connection = database.getConnection();
 
-        var preparedStatement = "";
+        try (var connection = database.getConnection()) {
+            String sql = "SELECT username, auth_token FROM auth WHERE auth_token = ?";
 
-        try {
-            return authTokens.get(authToken.authToken());
+            try (var preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, authToken.authToken());
+
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        var username = resultSet.getString("username");
+                        var token = resultSet.getString("auth_token");
+
+                        return new AuthToken(username, token);
+                    } else {
+                        throw new DataAccessException("Error: token not found in database");
+                    }
+                }
+            }
         } catch (Exception exception) {
-            throw new DataAccessException("Error: failed to get auth token");
+            throw new DataAccessException("Error: failed to get user data");
         }
     }
 
@@ -60,10 +73,31 @@ public class AuthDAO implements DAO<AuthToken> {
     @Override
     public void post(AuthToken authToken) throws DataAccessException {
         var database = new Database();
-        var connection = database.getConnection();
 
-        var preparedStatement = "";
-        authTokens.put(authToken.authToken(), authToken);
+        try (var connection = database.getConnection()) {
+            // check if the token already exists in the database. If it does, then an exception will be thrown
+            try (var preparedStatement = connection.prepareStatement("SELECT username, auth_token FROM auth WHERE auth_token = ?")) {
+                preparedStatement.setString(1, authToken.authToken());
+
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    // if the query returned any result, throw an error
+                    if (resultSet.next()) {
+                        throw new DataAccessException("Error: auth token already exists in database");
+                    }
+                }
+            }
+
+            String sql = "INSERT INTO auth (username, auth_token) VALUES (?, ?)";
+
+            try (var preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, authToken.username());
+                preparedStatement.setString(2, authToken.authToken());
+
+                preparedStatement.executeUpdate();
+            }
+        } catch (Exception exception) {
+            throw new DataAccessException("Error: failed to create new token");
+        }
     }
 
     /**
@@ -74,10 +108,18 @@ public class AuthDAO implements DAO<AuthToken> {
      */
 
     public void delete(AuthToken authToken) throws DataAccessException {
-        try {
-            authTokens.remove(authToken.authToken());
+        var database = new Database();
+
+        try (var connection = database.getConnection()) {
+            String sql = "DELETE FROM auth WHERE auth_token = ?";
+
+            try (var preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, authToken.authToken());
+
+                preparedStatement.executeUpdate();
+            }
         } catch (Exception exception) {
-            throw new DataAccessException("Error: Failed to delete auth token");
+            throw new DataAccessException("Error: failed to get auth data");
         }
     }
 
@@ -88,8 +130,14 @@ public class AuthDAO implements DAO<AuthToken> {
      */
     @Override
     public void deleteAll() throws DataAccessException {
-        try {
-            authTokens.clear();
+        var database = new Database();
+
+        try (var connection = database.getConnection()) {
+            String sql = "DELETE FROM auth;";
+
+            try (var preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.executeUpdate();
+            }
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to clear auth tokens from database");
         }
