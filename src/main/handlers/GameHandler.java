@@ -38,7 +38,9 @@ public class GameHandler {
             return gson.toJson(new CreateGameResponse("Error: unauthorized"));
         }
 
-        CreateGameRequest createGameRequest = new CreateGameRequest(request.body(), authToken);
+        CreateGameRequest requestBody = gson.fromJson(request.body(), CreateGameRequest.class);
+
+        CreateGameRequest createGameRequest = new CreateGameRequest(requestBody.gameName(), authToken);
 
         CreateGameResponse createGameResponse = gameService.createGame(createGameRequest);
 
