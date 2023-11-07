@@ -1,6 +1,7 @@
 package dataAccess;
 
 import chessImplementation.ChessGameImpl;
+import com.google.gson.Gson;
 import models.Game;
 
 import java.util.ArrayList;
@@ -105,6 +106,7 @@ public class GameDAO implements DAO<Game> {
     @Override
     public void post(Game game) throws DataAccessException {
         var database = new Database();
+        Gson gson = new Gson();
 
         try (var connection = database.getConnection()) {
             // check if the game with specified game name already exists in the database. If it does, then an exception will be thrown
@@ -127,7 +129,7 @@ public class GameDAO implements DAO<Game> {
                 preparedStatement.setString(3, game.blackUsername());
                 preparedStatement.setString(4, game.gameName());
                 //TODO: Again, make serializer/deserializer for chessgame
-                preparedStatement.setString(5, "game.chessGame.toString()");
+                preparedStatement.setString(5, gson.toJson(game.game()));
 
                 preparedStatement.executeUpdate();
             }
