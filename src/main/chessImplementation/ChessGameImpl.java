@@ -18,7 +18,6 @@ public class ChessGameImpl implements ChessGame {
         defaultBoard.resetBoard();
 
         this.board = defaultBoard;
-//        this.board = new ChessBoardImpl();
         this.team = TeamColor.WHITE;
     }
 
