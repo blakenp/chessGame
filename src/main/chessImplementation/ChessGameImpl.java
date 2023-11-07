@@ -14,11 +14,10 @@ public class ChessGameImpl implements ChessGame {
     private Set<ChessMove> enemyValidMoves = new HashSet<>();
 
     public ChessGameImpl() {
-//        ChessBoard defaultBoard = new ChessBoardImpl();
-//        defaultBoard.resetBoard();
-//
-//        this.board = defaultBoard;
-        this.board = new ChessBoardImpl();
+        ChessBoard defaultBoard = new ChessBoardImpl();
+        defaultBoard.resetBoard();
+
+        this.board = defaultBoard;
         this.team = TeamColor.WHITE;
     }
 

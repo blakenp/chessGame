@@ -1,7 +1,10 @@
 package dataAccess;
 
-import chessImplementation.ChessGameImpl;
+import chess.ChessGame;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import models.Game;
+import typeAdapters.ChessGameAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,15 +51,22 @@ public class GameDAO implements DAO<Game> {
                         var whiteUsername = resultSet.getString("white_username");
                         var blackUsername = resultSet.getString("black_username");
                         var gameName = resultSet.getString("game_name");
-//                        var chessGame = resultSet.getString("chess_game");
+                        var jsonChessGame = resultSet.getString("chess_game");
 
-                        // TODO: make a serializer and deserializer
-                        return new Game(gameID, whiteUsername, blackUsername, gameName, new ChessGameImpl());
+                        // deserialize JSON representation of chess game stored in Database to get it back to
+                        // it's concrete class/object representation
+                        var builder = new GsonBuilder();
+                        builder.registerTypeAdapter(ChessGame.class, new ChessGameAdapter());
+
+                        ChessGame chessGame = builder.create().fromJson(jsonChessGame, ChessGame.class);
+
+                        return new Game(gameID, whiteUsername, blackUsername, gameName, chessGame);
                     }
                 }
             }
             throw new DataAccessException("Error: game not found in database");
         } catch (Exception exception) {
+            exception.getStackTrace();
             throw new DataAccessException("Error: failed to get game data");
         }
     }
@@ -83,10 +93,16 @@ public class GameDAO implements DAO<Game> {
                         var whiteUsername = resultSet.getString("white_username");
                         var blackUsername = resultSet.getString("black_username");
                         var gameName = resultSet.getString("game_name");
-//                        var chessGame = resultSet.getString("chess_game");
+                        var jsonChessGame = resultSet.getString("chess_game");
 
-                        // TODO: make a serializer and deserializer
-                        gamesList.add(new Game(gameID, whiteUsername, blackUsername, gameName, new ChessGameImpl()));
+                        // deserialize JSON representation of chess game stored in Database to get it back to
+                        // it's concrete class/object representation
+                        var builder = new GsonBuilder();
+                        builder.registerTypeAdapter(ChessGame.class, new ChessGameAdapter());
+
+                        ChessGame chessGame = builder.create().fromJson(jsonChessGame, ChessGame.class);
+
+                        gamesList.add(new Game(gameID, whiteUsername, blackUsername, gameName, chessGame));
                     }
                 }
             }
@@ -105,6 +121,7 @@ public class GameDAO implements DAO<Game> {
     @Override
     public void post(Game game) throws DataAccessException {
         var database = new Database();
+        Gson gson = new Gson();
 
         try (var connection = database.getConnection()) {
             // check if the game with specified game name already exists in the database. If it does, then an exception will be thrown
@@ -126,8 +143,7 @@ public class GameDAO implements DAO<Game> {
                 preparedStatement.setString(2, game.whiteUsername());
                 preparedStatement.setString(3, game.blackUsername());
                 preparedStatement.setString(4, game.gameName());
-                //TODO: Again, make serializer/deserializer for chessgame
-                preparedStatement.setString(5, "game.chessGame.toString()");
+                preparedStatement.setString(5, gson.toJson(game.game()));
 
                 preparedStatement.executeUpdate();
             }
@@ -144,6 +160,7 @@ public class GameDAO implements DAO<Game> {
 
     public void put(Game game) throws DataAccessException {
         var database = new Database();
+        Gson gson = new Gson();
 
         try (var connection = database.getConnection()) {
             // check if the game with specified game name exists in the database. If it doesn't, then an exception will be thrown
@@ -165,8 +182,7 @@ public class GameDAO implements DAO<Game> {
                 preparedStatement.setString(2, game.whiteUsername());
                 preparedStatement.setString(3, game.blackUsername());
                 preparedStatement.setString(4, game.gameName());
-                //TODO: Again, make serializer/deserializer for chessgame
-                preparedStatement.setString(5, "game.chessGame.toString()");
+                preparedStatement.setString(5, gson.toJson(game.game()));
                 preparedStatement.setString(6, game.gameName());
 
                 preparedStatement.executeUpdate();

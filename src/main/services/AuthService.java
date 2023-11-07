@@ -65,7 +65,9 @@ public class AuthService {
         AuthToken authToken = new AuthToken(null, request.authToken());
 
         try {
-            if (authDAO.get(authToken) == null) {
+            try {
+                authDAO.get(authToken);
+            } catch (DataAccessException dataAccessException) {
                 return new LogoutResponse("Error: invalid auth token");
             }
 
