@@ -1,16 +1,28 @@
 package typeAdapters;
 
-import chessImplementation.ChessPieceImpl;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chessImplementation.*;
+import com.google.gson.*;
 
 import java.lang.reflect.Type;
 
-public class ChessPieceAdapter implements JsonDeserializer<ChessPieceImpl> {
+public class ChessPieceAdapter implements JsonDeserializer<ChessPiece> {
     @Override
-    public ChessPieceImpl deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        return null;
+    public ChessPiece deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        ChessPiece.PieceType pieceType = ChessPiece.PieceType.valueOf(jsonObject.get("type").getAsString());
+        ChessGame.TeamColor pieceColor = ChessGame.TeamColor.valueOf(jsonObject.get("color").getAsString());
+
+        ChessPiece chessPiece = switch (pieceType) {
+            case ROOK -> new Rook(pieceColor, pieceType);
+            case KNIGHT -> new Knight(pieceColor, pieceType);
+            case BISHOP -> new Bishop(pieceColor, pieceType);
+            case QUEEN -> new Queen(pieceColor, pieceType);
+            case KING -> new King(pieceColor, pieceType);
+            default -> new Pawn(pieceColor, pieceType);
+        };
+
+        return chessPiece;
     }
 }
