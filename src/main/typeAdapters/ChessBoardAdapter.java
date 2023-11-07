@@ -14,21 +14,19 @@ public class ChessBoardAdapter implements JsonDeserializer<ChessBoard> {
     public ChessBoard deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         ChessBoard board = new ChessBoardImpl();
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        JsonArray boardArrayObject = jsonObject.getAsJsonArray("board");
+        JsonArray boardArrayObject = jsonObject.getAsJsonArray("chessBoard");
         ChessPieceAdapter chessPieceAdapter = new ChessPieceAdapter();
 
-        for (var i = 1; i <= 8; i++) {
-            JsonObject rowObject = boardArrayObject.get(i).getAsJsonObject();
-            for (var j = 1; j <= 8; j++) {
-                String colKey = Integer.toString(j);
-                if (rowObject.has(colKey)) {
-                    JsonObject jsonChessPiece = rowObject.get(colKey).getAsJsonObject();
-                    if (jsonChessPiece != null) {
-                        ChessPosition chessPosition = new ChessPositionImpl(i, j);
+        for (var i = 0; i < 8; i++) {
+            JsonArray rowObject = boardArrayObject.get(i).getAsJsonArray();
+            for (var j = 0; j < 8; j++) {
+                JsonElement jsonChessPieceElement = rowObject.get(j);
+                if (!jsonChessPieceElement.isJsonNull()) {
+                    JsonObject jsonChessPiece = jsonChessPieceElement.getAsJsonObject();
+                    ChessPosition chessPosition = new ChessPositionImpl(i + 1, j + 1);
 
-                        ChessPiece chessPiece = chessPieceAdapter.deserialize(jsonChessPiece, ChessPiece.class, jsonDeserializationContext);
-                        board.addPiece(chessPosition, chessPiece);
-                    }
+                    ChessPiece chessPiece = chessPieceAdapter.deserialize(jsonChessPiece, ChessPiece.class, jsonDeserializationContext);
+                    board.addPiece(chessPosition, chessPiece);
                 }
             }
         }
