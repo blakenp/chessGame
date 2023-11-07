@@ -37,7 +37,9 @@ public class AuthService {
             user = userDAO.get(user);
 
             // if user is not found in the database, throw an error
-            if (userDAO.get(user) == null) {
+            try {
+                userDAO.get(user);
+            } catch (DataAccessException dataAccessException) {
                 return new LoginResponse("Error: user doesn't exist");
             }
 

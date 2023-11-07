@@ -114,7 +114,7 @@ public class GameDAO implements DAO<Game> {
                 try (var resultSet = preparedStatement.executeQuery()) {
                     // if the query returned any result, throw an error
                     if (resultSet.next()) {
-                        throw new DataAccessException("Error: game name  already taken");
+                        throw new DataAccessException("Error: game name already taken");
                     }
                 }
             }
@@ -146,6 +146,17 @@ public class GameDAO implements DAO<Game> {
         var database = new Database();
 
         try (var connection = database.getConnection()) {
+            // check if the game with specified game name exists in the database. If it doesn't, then an exception will be thrown
+            try (var preparedStatement = connection.prepareStatement("SELECT game_id, white_username, black_username, game_name, chess_game FROM game WHERE game_name = ?")) {
+                preparedStatement.setString(1, game.gameName());
+
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    // if the query didn't return any result, throw an error
+                    if (!resultSet.next()) {
+                        throw new DataAccessException("Error: game not found");
+                    }
+                }
+            }
 
             String sql = "UPDATE game SET game_id = ?, white_username = ?, black_username = ?, game_name = ?, chess_game = ? WHERE game_name = ?";
 

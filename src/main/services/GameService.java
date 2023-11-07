@@ -45,13 +45,10 @@ public class GameService {
                 return new CreateGameResponse("Error: bad request");
             }
 
-            // if the client's request includes a game name that is already taken, throw an error
-            if (gameDAO.get(newGame) != null) {
-                return new CreateGameResponse("Error: already taken");
-            }
-
             // if the auth token the client sent to the server is not already stored in the server, throw an error
-            if (authDAO.get(authToken) == null) {
+            try {
+                authDAO.get(authToken);
+            } catch (DataAccessException dataAccessException) {
                 return new CreateGameResponse("Error: unauthorized");
             }
 
@@ -73,20 +70,22 @@ public class GameService {
         AuthToken authToken = new AuthToken(null, request.authToken());
 
         try {
-            if (authDAO.get(authToken) == null) {
+            try {
+                authToken = authDAO.get(authToken);
+            } catch (DataAccessException dataAccessException) {
                 return new JoinGameResponse("Error: unauthorized");
             }
 
-            authToken = authDAO.get(authToken);
             User user = new User(authToken.username(), null, null);
             user = userDAO.get(user);
             Game storedGame = new Game(request.gameID(), null, null, null, new ChessGameImpl());
 
-            if (gameDAO.get(storedGame) == null) {
+            try {
+                storedGame = gameDAO.get(storedGame);
+            } catch (DataAccessException dataAccessException) {
                 return new JoinGameResponse("Error: bad request");
             }
 
-            storedGame = gameDAO.get(storedGame);
             Game updatedGame;
 
             // just join as an observer if no team color was specified
@@ -122,7 +121,9 @@ public class GameService {
         List<Game> games;
 
         try {
-            if (authDAO.get(authToken) == null) {
+            try {
+                authDAO.get(authToken);
+            } catch (DataAccessException dataAccessException) {
                 return new ListGamesResponse("Error: unauthorized");
             }
 
