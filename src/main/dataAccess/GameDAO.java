@@ -66,7 +66,6 @@ public class GameDAO implements DAO<Game> {
             }
             throw new DataAccessException("Error: game not found in database");
         } catch (Exception exception) {
-            exception.getStackTrace();
             throw new DataAccessException("Error: failed to get game data");
         }
     }
