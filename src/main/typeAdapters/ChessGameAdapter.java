@@ -11,6 +11,8 @@ import java.lang.reflect.Type;
 public class ChessGameAdapter implements JsonDeserializer<ChessGameImpl> {
     @Override
     public ChessGameImpl deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+
+
         return null;
     }
 }
