@@ -38,7 +38,9 @@ public class GameHandler {
             return gson.toJson(new CreateGameResponse("Error: unauthorized"));
         }
 
-        CreateGameRequest createGameRequest = new CreateGameRequest(request.body(), authToken);
+        CreateGameRequest requestBody = gson.fromJson(request.body(), CreateGameRequest.class);
+
+        CreateGameRequest createGameRequest = new CreateGameRequest(requestBody.gameName(), authToken);
 
         CreateGameResponse createGameResponse = gameService.createGame(createGameRequest);
 
@@ -47,6 +49,7 @@ public class GameHandler {
                 case "Error: bad request" -> response.status(400);
                 case "Error: unauthorized" -> response.status(401);
                 case "Error: already taken" -> response.status(403);
+                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(401);
                 case "Error: an internal server error has occurred" -> response.status(500);
             }
         }
@@ -81,7 +84,7 @@ public class GameHandler {
                 case "Error: bad request" -> response.status(400);
                 case "Error: unauthorized" -> response.status(401);
                 case "Error: already taken" -> response.status(403);
-                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(500);
+                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(401);
                 case "Error: an internal server error has occurred" -> response.status(500);
             }
         }
@@ -114,7 +117,7 @@ public class GameHandler {
                 case "Error: bad request" -> response.status(400);
                 case "Error: unauthorized" -> response.status(401);
                 case "Error: already taken" -> response.status(403);
-                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(500);
+                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(401);
                 case "Error: an internal server error has occurred" -> response.status(500);
             }
         }

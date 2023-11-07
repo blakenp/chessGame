@@ -2,16 +2,12 @@ package dataAccess;
 
 import models.User;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Object representation of the data access object used to store and fetch the data related to users in the database
  */
 public class UserDAO implements DAO<User> {
 
     private static UserDAO instance = null;
-    private Map<String, User> users = new HashMap<>();
 
     /**
      * Singleton design to make sure just one instance of this class is used in the api endpoints
@@ -34,8 +30,25 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public User get(User user) throws DataAccessException {
-        try {
-            return users.get(user.username());
+        var database = new Database();
+
+        try (var connection = database.getConnection()) {
+            String sql = "SELECT username, password, email FROM user WHERE username = ?";
+
+            try (var preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, user.username());
+
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        var username = resultSet.getString("username");
+                        var password = resultSet.getString("password");
+                        var email = resultSet.getString("email");
+
+                        return new User(username, password, email);
+                    }
+                }
+            }
+            throw new DataAccessException("Error: User not found in database");
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to get user data");
         }
@@ -48,8 +61,30 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public void post(User user) throws DataAccessException {
-        try {
-            users.put(user.username(), user);
+        var database = new Database();
+
+        try (var connection = database.getConnection()) {
+            // check if the user already exists in the database. If they do, then an exception will be thrown
+            try (var preparedStatement = connection.prepareStatement("SELECT username, password, email FROM user WHERE username=?")) {
+                preparedStatement.setString(1, user.username());
+
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    // if the query returned any result, throw an error
+                    if (resultSet.next()) {
+                        throw new DataAccessException("Error: username already taken");
+                    }
+                }
+            }
+
+            String sql = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
+
+            try (var preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, user.username());
+                preparedStatement.setString(2, user.password());
+                preparedStatement.setString(3, user.email());
+
+                preparedStatement.executeUpdate();
+            }
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to create new user");
         }
@@ -62,8 +97,14 @@ public class UserDAO implements DAO<User> {
      */
     @Override
     public void deleteAll() throws DataAccessException {
-        try {
-            users.clear();
+        var database = new Database();
+
+        try (var connection = database.getConnection()) {
+            String sql = "DELETE FROM user;";
+
+            try (var preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.executeUpdate();
+            }
         } catch (Exception exception) {
             throw new DataAccessException("Error: failed to clear users from database");
         }

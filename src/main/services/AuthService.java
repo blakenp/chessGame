@@ -37,13 +37,10 @@ public class AuthService {
             user = userDAO.get(user);
 
             // if user is not found in the database, throw an error
-            if (userDAO.get(user) == null) {
+            try {
+                userDAO.get(user);
+            } catch (DataAccessException dataAccessException) {
                 return new LoginResponse("Error: user doesn't exist");
-            }
-
-            // if auth token is already stored in the database, then throw an error
-            if (authDAO.get(authToken) != null) {
-                return new LoginResponse("Error: invalid auth token");
             }
 
             // if password received by client doesn't match stored password for that client, throw an error
@@ -68,7 +65,9 @@ public class AuthService {
         AuthToken authToken = new AuthToken(null, request.authToken());
 
         try {
-            if (authDAO.get(authToken) == null) {
+            try {
+                authDAO.get(authToken);
+            } catch (DataAccessException dataAccessException) {
                 return new LogoutResponse("Error: invalid auth token");
             }
 

@@ -35,10 +35,9 @@ public class AuthHandler {
 
         if (logoutResponse.getMessage() != null) {
             switch (logoutResponse.getMessage()) {
-                case "Error: user doesn't exist" -> response.status(404);
-                case "Error: invalid auth token" -> response.status(401);
-                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(401);
                 case "Error: unauthorized" -> response.status(401);
+                case "Error: user doesn't exist" -> response.status(404);
+                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(401);
                 case "Error: an internal server error has occurred" -> response.status(500);
             }
         }
@@ -71,7 +70,7 @@ public class AuthHandler {
         if (logoutResponse.getMessage() != null) {
             switch (logoutResponse.getMessage()) {
                 case "Error: invalid auth token" -> response.status(401);
-                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(500);
+                case "Error: an error occurred accessing, creating, deleting, or updating data" -> response.status(403);
                 case "Error: an internal server error has occurred" -> response.status(500);
             }
         }

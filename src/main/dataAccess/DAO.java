@@ -1,7 +1,5 @@
 package dataAccess;
 
-import java.util.List;
-
 /**
  * This is an abstract interface that lays the foundations for the DAOs I have to implement by defining
  * the CRUD methods that DAOs can perform on a database. T represents any type of object, so it can work
