@@ -1,4 +1,4 @@
-package passoffTests.serverTests;
+package unitTests;
 
 import chess.ChessGame;
 import chessImplementation.ChessGameImpl;
