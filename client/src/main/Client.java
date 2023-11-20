@@ -1,4 +1,6 @@
 import com.google.gson.Gson;
+import requests.LoginRequest;
+import requests.RegisterRequest;
 import ui.EscapeSequences;
 
 import java.util.Scanner;
@@ -15,21 +17,41 @@ public class Client {
         while (client.getUsingStatus()) {
             String userInput = scanner.nextLine();
 
-            if (userInput.startsWith("register")) {
+            if (!client.getLoggedInStatus()) {
+                if (userInput.startsWith("register")) {
+                    String[] commandArgs = userInput.split(" ");
+                    if (commandArgs.length == 4) {
+                        String username = commandArgs[1];
+                        String password = commandArgs[2];
+                        String email = commandArgs[3];
 
-            } else if (userInput.startsWith("login")) {
+                        RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+                    } else {
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid register command. Command syntax is register <USERNAME> <PASSWORD> <EMAIL>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
+                    }
+                } else if (userInput.startsWith("login")) {
+                    String[] commandArgs = userInput.split(" ");
+                    if (commandArgs.length == 3) {
+                        String username = commandArgs[1];
+                        String password = commandArgs[2];
 
-            } else if (userInput.equals("help")) {
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>" + EscapeSequences.RESET_TEXT_COLOR + " - to create an account");
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>" + EscapeSequences.RESET_TEXT_COLOR + " - to login and play chess");
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help" + EscapeSequences.RESET_TEXT_COLOR + " - to display all possible commands");
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "quit" + EscapeSequences.RESET_TEXT_COLOR + " - to exit the chess program");
-            } else if (userInput.equals("quit")) {
-                client.setUsingStatus(false);
+                        LoginRequest loginRequest = new LoginRequest(username, password);
+                        client.setLoggedInStatus(true);
+                    } else {
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid login command. Command syntax is login <USERNAME> <PASSWORD>" + EscapeSequences.SET_TEXT_COLOR_WHITE);
+                    }
+                } else if (userInput.equals("help")) {
+                    client.displayHelpMenu();
+                } else if (userInput.equals("quit")) {
+                    client.setUsingStatus(false);
+                } else {
+                    System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_WHITE);
+                }
             }
         }
 
         System.out.println("Goodbye!");
+        System.exit(0);
     }
 
     private boolean getUsingStatus() {
@@ -45,6 +67,13 @@ public class Client {
 
     private void setLoggedInStatus(boolean status) {
         this.isLoggedIn = status;
+    }
+
+    private void displayHelpMenu() {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - to create an account");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - to login and play chess");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "help" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - to display all possible commands");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "quit" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - to exit the chess program");
     }
 
 }
