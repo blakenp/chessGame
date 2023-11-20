@@ -6,6 +6,7 @@ import java.util.Scanner;
 public class Client {
     private boolean isLoggedIn = false;
     private boolean isStillUsing = true;
+
     public static void main(String[] args) {
         Client client = new Client();
         Scanner scanner = new Scanner(System.in);
