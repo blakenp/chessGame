@@ -1,7 +1,6 @@
 package handlers;
 
 import com.google.gson.Gson;
-import dataAccess.AuthDAO;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import requests.ListGamesRequest;
