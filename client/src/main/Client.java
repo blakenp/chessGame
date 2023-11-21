@@ -165,6 +165,7 @@ public class Client {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + joinGameResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                         } else {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Successfully joined as observer" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                            client.setInGameStatus(true);
                         }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
