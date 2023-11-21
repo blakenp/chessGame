@@ -1,4 +1,9 @@
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
+import chessImplementation.ChessGameImpl;
+import chessImplementation.ChessPositionImpl;
 import models.AuthToken;
 import models.Game;
 import requests.*;
@@ -18,7 +23,7 @@ public class Client {
         Client client = new Client();
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Welcome to 240 chess. Type help to get started.");
+        System.out.println(EscapeSequences.BLACK_KING + " Welcome to 240 chess. Type help to get started." + EscapeSequences.BLACK_KING);
         while (client.getUsingStatus()) {
             if (client.getInGameStatus()) {
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + "[IN GAME SESSION] >>> ");
@@ -104,7 +109,7 @@ public class Client {
                         if (createGameResponse.getMessage() != null) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + createGameResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                         } else {
-                            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Successfully created game " + gameName + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Game ID: " + createGameResponse.getGameID() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                         }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -147,6 +152,10 @@ public class Client {
                             } else {
                                 System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW  + joinGameResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                                 client.setInGameStatus(true);
+                                ChessGame newGame = new ChessGameImpl();
+                                client.redrawBoardBlack(newGame);
+                                System.out.print("\n");
+                                client.redrawBoardWhite(newGame);
                             }
                         } catch (NumberFormatException exception) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Game ID must be a number");
@@ -166,6 +175,10 @@ public class Client {
                         } else {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Successfully joined as observer" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                             client.setInGameStatus(true);
+                            ChessGame newGame = new ChessGameImpl();
+                            client.redrawBoardBlack(newGame);
+                            System.out.print("\n");
+                            client.redrawBoardWhite(newGame);
                         }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -263,5 +276,130 @@ public class Client {
     private String formatGameString(Game game) {
         return "Game ID: " + game.gameID() + ", White Team Player: " + game.whiteUsername() + ", Black Team Player: " + game.blackUsername() + ", Game Name: " + game.gameName();
     }
+
+    private void redrawBoardBlack(ChessGame game) {
+        ChessBoard chessBoard = game.getBoard();
+        StringBuilder boardString = new StringBuilder();
+
+        boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+        boardString.append("\n");
+        for (var i = 1; i <= 8; i++) {
+            boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
+            for (var j = 1; j <= 8; j++) {
+                ChessPosition chessPosition = new ChessPositionImpl(i, j);
+                ChessPiece chessPiece = chessBoard.getPiece(chessPosition);
+
+                if (i % 2 != 0) {
+                    if (j % 2 != 0) {
+                        boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                    } else {
+                        boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                    }
+                } else {
+                    if (j % 2 != 0) {
+                        boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                    } else {
+                        boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                    }
+                }
+
+                if (chessPiece == null) {
+                    boardString.append(EscapeSequences.EMPTY);
+                } else {
+                    if (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                        boardString.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
+                        switch (chessPiece.getPieceType()) {
+                            case ROOK -> boardString.append(EscapeSequences.WHITE_ROOK);
+                            case KNIGHT -> boardString.append(EscapeSequences.WHITE_KNIGHT);
+                            case BISHOP -> boardString.append(EscapeSequences.WHITE_BISHOP);
+                            case KING -> boardString.append(EscapeSequences.WHITE_KING);
+                            case QUEEN -> boardString.append(EscapeSequences.WHITE_QUEEN);
+                            default -> boardString.append(EscapeSequences.WHITE_PAWN);
+                        }
+                    } else {
+                        boardString.append(EscapeSequences.SET_TEXT_COLOR_RED);
+                        switch (chessPiece.getPieceType()) {
+                            case ROOK -> boardString.append(EscapeSequences.BLACK_ROOK);
+                            case KNIGHT -> boardString.append(EscapeSequences.BLACK_KNIGHT);
+                            case BISHOP -> boardString.append(EscapeSequences.BLACK_BISHOP);
+                            case KING -> boardString.append(EscapeSequences.BLACK_KING);
+                            case QUEEN -> boardString.append(EscapeSequences.BLACK_QUEEN);
+                            default -> boardString.append(EscapeSequences.WHITE_PAWN);
+                        }
+                    }
+                }
+
+                boardString.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+            }
+            boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
+            boardString.append("\n");
+        }
+
+        boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+        System.out.println(boardString);
+    }
+
+    private void redrawBoardWhite(ChessGame game) {
+        ChessBoard chessBoard = game.getBoard();
+        StringBuilder boardString = new StringBuilder();
+
+        boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+        boardString.append("\n");
+        for (var i = 8; i >= 1; i--) {
+            boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
+            for (var j = 8; j >= 1; j--) {
+                ChessPosition chessPosition = new ChessPositionImpl(i, j);
+                ChessPiece chessPiece = chessBoard.getPiece(chessPosition);
+
+                if (i % 2 != 0) {
+                    if (j % 2 != 0) {
+                        boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                    } else {
+                        boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                    }
+                } else {
+                    if (j % 2 != 0) {
+                        boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                    } else {
+                        boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                    }
+                }
+
+                if (chessPiece == null) {
+                    boardString.append(EscapeSequences.EMPTY);
+                } else {
+                    if (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                        boardString.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
+                        switch (chessPiece.getPieceType()) {
+                            case ROOK -> boardString.append(EscapeSequences.WHITE_ROOK);
+                            case KNIGHT -> boardString.append(EscapeSequences.WHITE_KNIGHT);
+                            case BISHOP -> boardString.append(EscapeSequences.WHITE_BISHOP);
+                            case KING -> boardString.append(EscapeSequences.WHITE_KING);
+                            case QUEEN -> boardString.append(EscapeSequences.WHITE_QUEEN);
+                            default -> boardString.append(EscapeSequences.WHITE_PAWN);
+                        }
+                    } else {
+                        boardString.append(EscapeSequences.SET_TEXT_COLOR_RED);
+                        switch (chessPiece.getPieceType()) {
+                            case ROOK -> boardString.append(EscapeSequences.BLACK_ROOK);
+                            case KNIGHT -> boardString.append(EscapeSequences.BLACK_KNIGHT);
+                            case BISHOP -> boardString.append(EscapeSequences.BLACK_BISHOP);
+                            case KING -> boardString.append(EscapeSequences.BLACK_KING);
+                            case QUEEN -> boardString.append(EscapeSequences.BLACK_QUEEN);
+                            default -> boardString.append(EscapeSequences.WHITE_PAWN);
+                        }
+                    }
+                }
+
+                boardString.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+            }
+            boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
+            boardString.append("\n");
+        }
+
+        boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+        System.out.println(boardString);
+    }
+
 
 }
