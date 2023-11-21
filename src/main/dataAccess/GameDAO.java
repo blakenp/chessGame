@@ -96,12 +96,12 @@ public class GameDAO implements DAO<Game> {
 
                         // deserialize JSON representation of chess game stored in Database to get it back to
                         // it's concrete class/object representation
-                        var builder = new GsonBuilder();
-                        builder.registerTypeAdapter(ChessGame.class, new ChessGameAdapter());
+//                        var builder = new GsonBuilder();
+//                        builder.registerTypeAdapter(ChessGame.class, new ChessGameAdapter());
+//
+//                        ChessGame chessGame = builder.create().fromJson(jsonChessGame, ChessGame.class);
 
-                        ChessGame chessGame = builder.create().fromJson(jsonChessGame, ChessGame.class);
-
-                        gamesList.add(new Game(gameID, whiteUsername, blackUsername, gameName, chessGame));
+                        gamesList.add(new Game(gameID, whiteUsername, blackUsername, gameName, null));
                     }
                 }
             }

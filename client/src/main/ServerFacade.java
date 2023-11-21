@@ -18,7 +18,6 @@ public class ServerFacade {
         http.setRequestMethod(method);
         writeRequestBody(body, http);
         http.connect();
-        System.out.printf("= Request =========\n[%s] %s\n\n%s\n\n", method, url, body);
         return http;
     }
 
@@ -29,7 +28,6 @@ public class ServerFacade {
         http.setRequestProperty("Authorization", authToken);
         writeRequestBody(body, http);
         http.connect();
-        System.out.printf("= Request =========\n[%s] %s\n\n%s\n\n", method, url, body);
         return http;
     }
 
@@ -43,13 +41,11 @@ public class ServerFacade {
     }
 
     private static <T> T readResponseBody(HttpURLConnection http, Class<T> responseType) throws IOException {
-        T responseBody = null;
+        T responseBody;
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            System.out.println("here");
             responseBody = new Gson().fromJson(inputStreamReader, responseType);
         }
-        System.out.println("success return");
         return responseBody;
     }
 
