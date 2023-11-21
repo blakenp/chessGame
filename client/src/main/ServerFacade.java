@@ -109,9 +109,18 @@ public class ServerFacade {
             HttpURLConnection http = sendAuthRequest(baseBackendUrl + "/game", "GET", "", listGamesRequest.authToken());
             return readResponseBody(http, ListGamesResponse.class);
         } catch (IOException | URISyntaxException exception) {
-            System.out.println("what?");
             exception.getStackTrace();
             return new ListGamesResponse("Error: Server error or unauthorized");
+        }
+    }
+
+    public static ClearResponse handleClientClearDB() {
+        try {
+            HttpURLConnection http = sendRequest(baseBackendUrl + "/db", "DELETE", "");
+            return readResponseBody(http, ClearResponse.class);
+        } catch (IOException | URISyntaxException exception) {
+            exception.getStackTrace();
+            return new ClearResponse("Error: Server error or unauthorized");
         }
     }
 }
