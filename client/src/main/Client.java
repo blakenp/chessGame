@@ -1,9 +1,6 @@
 import chess.ChessGame;
-import com.google.gson.Gson;
 import models.AuthToken;
 import requests.*;
-import responses.ListGamesResponse;
-import responses.LogoutResponse;
 import responses.RegisterResponse;
 import ui.EscapeSequences;
 
@@ -105,7 +102,7 @@ public class Client {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                     }
                 } else if (userInput.equals("logout")) {
-                    LogoutResponse logoutResponse = new LogoutResponse(client.authToken.authToken());
+                    LogoutRequest logoutRequest = new LogoutRequest(client.authToken.authToken());
                     client.setLoggedInStatus(false);
                 } else if (userInput.equals("help")) {
                     client.displayHelpMenuLoggedIn();
