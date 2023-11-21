@@ -20,10 +20,10 @@ public class Client {
 
         System.out.println("Welcome to 240 chess. Type help to get started.");
         while (client.getUsingStatus()) {
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + "[LOGGED OUT] >>> ");
-            String userInput = scanner.nextLine();
-
             if (!client.getLoggedInStatus()) {
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + "[LOGGED OUT] >>> ");
+                String userInput = scanner.nextLine();
+
                 if (userInput.startsWith("register")) {
                     String[] commandArgs = userInput.split(" ");
                     if (commandArgs.length == 4) {
@@ -63,6 +63,9 @@ public class Client {
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                 }
             } else {
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + "[LOGGED IN] >>> ");
+                String userInput = scanner.nextLine();
+
                 if (userInput.startsWith("create")) {
                     String[] commandArgs = userInput.split(" ");
                     if (commandArgs.length == 2) {
@@ -80,14 +83,14 @@ public class Client {
                         int gameID = Integer.parseInt(commandArgs[1]);
                         String color = commandArgs[2].toUpperCase();
                         ChessGame.TeamColor teamColor = ChessGame.TeamColor.WHITE;
-                        
+
                         if (!color.equals("WHITE") && !color.equals("BLACK")) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid Team Choice. Choices are WHITE or BLACK" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                             continue;
                         } else if (color.equals("BLACK")) {
                             teamColor = ChessGame.TeamColor.BLACK;
                         }
-                        
+
                         JoinGameRequest joinGameRequest = new JoinGameRequest(teamColor, gameID, client.getAuthToken().authToken());
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -96,7 +99,7 @@ public class Client {
                     String[] commandArgs = userInput.split(" ");
                     if (commandArgs.length == 2) {
                         int gameID = Integer.parseInt(commandArgs[1]);
-                        
+
                         JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameID, client.getAuthToken().authToken());
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -105,7 +108,7 @@ public class Client {
                     LogoutResponse logoutResponse = new LogoutResponse(client.authToken.authToken());
                     client.setLoggedInStatus(false);
                 } else if (userInput.equals("help")) {
-                    
+                    client.displayHelpMenuLoggedIn();
                 } else if (userInput.equals("quit")) {
                     client.setUsingStatus(false);
                 } else {
