@@ -29,18 +29,21 @@ public class Client {
                 System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + "[IN GAME SESSION] >>> ");
                 String userInput = scanner.nextLine();
 
-                if (userInput.equals("redraw")) {
-                    System.out.println("Call game toString() function here");
-                } else if (userInput.equals("highlight")) {
+                if (userInput.startsWith("redraw")) {
+                    ChessGame newGame = new ChessGameImpl();
+                    client.redrawBoardBlack(newGame);
+                    System.out.print("\n");
+                    client.redrawBoardWhite(newGame);
+                } else if (userInput.startsWith("highlight")) {
                     System.out.println("Logic for highlighting valid moves goes here");
-                } else if (userInput.equals("move")) {
+                } else if (userInput.startsWith("move")) {
                     System.out.println("Logic for making a move on the board goes here");
                 } else if (userInput.startsWith("resign")) {
                     System.out.println("Logic for resigning a game goes here");
-                } else if (userInput.equals("leave")) {
+                } else if (userInput.startsWith("leave")) {
                     System.out.println("Logic for leaving a game goes here");
                     client.setInGameStatus(false);
-                } else if (userInput.equals("help")) {
+                } else if (userInput.startsWith("help")) {
                     client.displayHelpMenuInGame();
                 } else {
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -88,9 +91,9 @@ public class Client {
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid login command. Command syntax is login <USERNAME> <PASSWORD>" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                     }
-                } else if (userInput.equals("help")) {
+                } else if (userInput.startsWith("help")) {
                     client.displayHelpMenuLoggedOut();
-                } else if (userInput.equals("quit")) {
+                } else if (userInput.startsWith("quit")) {
                     client.setUsingStatus(false);
                 } else {
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -114,7 +117,7 @@ public class Client {
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                     }
-                } else if (userInput.equals("list")) {
+                } else if (userInput.startsWith("list")) {
                     ListGamesRequest listGamesRequest = new ListGamesRequest(client.getAuthToken().authToken());
                     ListGamesResponse listGamesResponse = ServerFacade.handleClientListGames(listGamesRequest);
                     if (listGamesResponse.getMessage() != null) {
@@ -183,7 +186,7 @@ public class Client {
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                     }
-                } else if (userInput.equals("logout")) {
+                } else if (userInput.startsWith("logout")) {
                     LogoutRequest logoutRequest = new LogoutRequest(client.authToken.authToken());
                     LogoutResponse logoutResponse = ServerFacade.handleClientLogout(logoutRequest);
                     if (logoutResponse.getMessage().startsWith("Error")) {
@@ -193,9 +196,9 @@ public class Client {
                         client.setLoggedInStatus(false);
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + logoutResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                     }
-                } else if (userInput.equals("help")) {
+                } else if (userInput.startsWith("help")) {
                     client.displayHelpMenuLoggedIn();
-                } else if (userInput.equals("quit")) {
+                } else if (userInput.startsWith("quit")) {
                     LogoutRequest logoutRequest = new LogoutRequest(client.authToken.authToken());
                     LogoutResponse logoutResponse = ServerFacade.handleClientLogout(logoutRequest);
                     if (logoutResponse.getMessage().startsWith("Error")) {

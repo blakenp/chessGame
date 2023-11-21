@@ -1,4 +1,5 @@
 import chess.ChessGame;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -199,5 +200,10 @@ public class ServerFacadeTests {
 
         ListGamesRequest listGamesRequest = new ListGamesRequest(registerResponse.getAuthToken());
         assertNull(ServerFacade.handleClientListGames(listGamesRequest).getGames(), "The only GET method the Server has should return nothing since the DB was cleared");
+    }
+
+    @AfterAll
+    public static void clearDBAfterAllTests() {
+        ServerFacade.handleClientClearDB();
     }
 }
