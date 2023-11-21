@@ -32,7 +32,12 @@ public class UserService {
                 return new RegisterResponse("Error: bad request");
             }
 
-            userDAO.post(newUser);
+            try {
+                userDAO.post(newUser);
+            } catch (DataAccessException dataAccessException) {
+                return new RegisterResponse("Error: already taken");
+            }
+
             authDAO.post(authToken);
         } catch (DataAccessException dataAccessException) {
             return new RegisterResponse("Error: an error occurred accessing, creating, deleting, or updating data");

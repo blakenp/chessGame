@@ -1,7 +1,7 @@
 import chess.ChessGame;
 import models.AuthToken;
 import requests.*;
-import responses.RegisterResponse;
+import responses.*;
 import ui.EscapeSequences;
 
 import java.util.Scanner;
@@ -31,7 +31,7 @@ public class Client {
                         RegisterRequest registerRequest = new RegisterRequest(username, password, email);
                         RegisterResponse registerResponse = ServerFacade.handleClientRegister(registerRequest);
                         if (registerResponse.getMessage() != null) {
-                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Error: an error occurred with the server or that username is already taken" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + registerResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                         }
                         else {
                             client.setAuthToken(new AuthToken(registerResponse.getUsername(), registerResponse.getAuthToken()));
@@ -48,7 +48,14 @@ public class Client {
                         String password = commandArgs[2];
 
                         LoginRequest loginRequest = new LoginRequest(username, password);
-                        client.setLoggedInStatus(true);
+                        LoginResponse loginResponse = ServerFacade.handleClientLogin(loginRequest);
+                        if (loginResponse.getMessage() != null) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + loginResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                        } else {
+                            client.setAuthToken(new AuthToken(loginResponse.getUsername(), loginResponse.getAuthToken()));
+                            client.setLoggedInStatus(true);
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Logged in as " + loginResponse.getUsername() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                        }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid login command. Command syntax is login <USERNAME> <PASSWORD>" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                     }
@@ -69,11 +76,23 @@ public class Client {
                         String gameName = commandArgs[1];
 
                         CreateGameRequest createGameRequest = new CreateGameRequest(gameName, client.getAuthToken().authToken());
+                        CreateGameResponse createGameResponse = ServerFacade.handleClientCreateGame(createGameRequest);
+                        if (createGameResponse.getMessage() != null) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + createGameResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                        } else {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Successfully created game " + gameName + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                        }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                     }
                 } else if (userInput.equals("list")) {
                     ListGamesRequest listGamesRequest = new ListGamesRequest(client.getAuthToken().authToken());
+                    ListGamesResponse listGamesResponse = ServerFacade.handleClientListGames(listGamesRequest);
+                    if (listGamesResponse.getMessage() != null) {
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + listGamesResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                    } else {
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "yay" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                    }
                 } else if (userInput.startsWith("join")) {
                     String[] commandArgs = userInput.split(" ");
                     if (commandArgs.length == 3) {
@@ -89,6 +108,12 @@ public class Client {
                         }
 
                         JoinGameRequest joinGameRequest = new JoinGameRequest(teamColor, gameID, client.getAuthToken().authToken());
+                        JoinGameResponse joinGameResponse = ServerFacade.handleClientJoinGame(joinGameRequest);
+                        if (joinGameResponse.getMessage().startsWith("Error")) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + joinGameResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                        } else {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW  + joinGameResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                        }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                     }
@@ -98,16 +123,38 @@ public class Client {
                         int gameID = Integer.parseInt(commandArgs[1]);
 
                         JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameID, client.getAuthToken().authToken());
+                        JoinGameResponse joinGameResponse = ServerFacade.handleClientJoinGame(joinGameRequest);
+                        if (joinGameResponse.getMessage().startsWith("Error")) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + joinGameResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                        } else {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Successfully joined as observer" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                        }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                     }
                 } else if (userInput.equals("logout")) {
                     LogoutRequest logoutRequest = new LogoutRequest(client.authToken.authToken());
-                    client.setLoggedInStatus(false);
+                    LogoutResponse logoutResponse = ServerFacade.handleClientLogout(logoutRequest);
+                    if (logoutResponse.getMessage().startsWith("Error")) {
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + logoutResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                    } else {
+                        client.setAuthToken(null);
+                        client.setLoggedInStatus(false);
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + logoutResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                    }
                 } else if (userInput.equals("help")) {
                     client.displayHelpMenuLoggedIn();
                 } else if (userInput.equals("quit")) {
-                    client.setUsingStatus(false);
+                    LogoutRequest logoutRequest = new LogoutRequest(client.authToken.authToken());
+                    LogoutResponse logoutResponse = ServerFacade.handleClientLogout(logoutRequest);
+                    if (logoutResponse.getMessage().startsWith("Error")) {
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + logoutResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                    } else {
+                        client.setAuthToken(null);
+                        client.setLoggedInStatus(false);
+                        client.setUsingStatus(false);
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + logoutResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                    }
                 } else {
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                 }
