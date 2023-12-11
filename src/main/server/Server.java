@@ -2,11 +2,14 @@ package server;
 
 import spark.Spark;
 import handlers.*;
+import org.eclipse.jetty.websocket.api.annotations.*;
+import org.eclipse.jetty.websocket.api.*;
 
 /**
  * Object representation of the chess game server that handles client requests and helps
  * store game data and logic
  */
+@WebSocket
 public class Server {
 
     public static void main(String[] args) {
@@ -24,6 +27,8 @@ public class Server {
     }
 
     private static void createRoutes() {
+        Spark.webSocket("/connect", Server.class);
+
         Spark.delete("/db", (request, response) ->
                 TestingHandler.handleClear()
         );
@@ -51,5 +56,10 @@ public class Server {
         Spark.get("/game", (request, response) ->
                 GameHandler.handleListGames(request, response)
         );
+    }
+
+    @OnWebSocketMessage
+    public void onMessage(Session session, String message) throws Exception {
+        session.getRemote().sendString("WebSocket response: " + message);
     }
 }
