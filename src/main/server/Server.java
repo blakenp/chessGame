@@ -11,8 +11,13 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
+import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Object representation of the chess game server that handles client requests and helps
@@ -20,6 +25,8 @@ import webSocketMessages.userCommands.*;
  */
 @WebSocket
 public class Server {
+    private HashMap<String, Connection> connectionMap = new HashMap<>();
+    private HashMap<Integer, Set<Connection>> connectionsToGames = new HashMap<>();
 
     public static void main(String[] args) {
         new Server().run();
@@ -78,20 +85,49 @@ public class Server {
 
         if (commandType == UserGameCommand.CommandType.JOIN_PLAYER) {
             JoinPlayerCommand joinPlayerCommand = gson.fromJson(message, JoinPlayerCommand.class);
-            System.out.println("we be in join player command bro");
-
             Game game = WSService.handleJoinPlayerCommand(joinPlayerCommand);
 
-            ChessGame.TeamColor teamColor = joinPlayerCommand.getPlayerColor();
-            if (teamColor == ChessGame.TeamColor.WHITE && game.whiteUsername().isEmpty()) {
-                ErrorMessage errorMessage = new ErrorMessage("Error: game wasn't correctly updated to show you as team white player", ServerMessage.ServerMessageType.ERROR);
-                response = gson.toJson(errorMessage);
-            } else if (teamColor == ChessGame.TeamColor.BLACK && game.blackUsername().isEmpty()) {
-                ErrorMessage errorMessage = new ErrorMessage("Error: game wasn't correctly updated to show you as team black player", ServerMessage.ServerMessageType.ERROR);
-                response = gson.toJson(errorMessage);
+            if (game != null) {
+                ChessGame.TeamColor teamColor = joinPlayerCommand.getPlayerColor();
+                Connection connection = new Connection(joinPlayerCommand.getAuthString(), session);
+                connectionMap.put(joinPlayerCommand.getAuthString(), connection);
+
+                Set<Connection> gameConnections = connectionsToGames.get(game.gameID());
+                if (gameConnections == null) {
+                    gameConnections = new HashSet<>();
+                    connectionsToGames.put(game.gameID(), gameConnections);
+                }
+                gameConnections.add(connection);
+
+                String username = "";
+                if (teamColor == ChessGame.TeamColor.WHITE) {
+                    username = game.whiteUsername();
+                } else if (teamColor == ChessGame.TeamColor.BLACK) {
+                    username = game.blackUsername();
+                }
+
+                if (teamColor == ChessGame.TeamColor.WHITE && game.whiteUsername().isEmpty()) {
+                    ErrorMessage errorMessage = new ErrorMessage("Error: game wasn't correctly updated to show you as team white player", ServerMessage.ServerMessageType.ERROR);
+                    System.out.println("in empty white team");
+                    response = gson.toJson(errorMessage);
+                } else if (teamColor == ChessGame.TeamColor.BLACK && game.blackUsername().isEmpty()) {
+                    ErrorMessage errorMessage = new ErrorMessage("Error: game wasn't correctly updated to show you as team black player", ServerMessage.ServerMessageType.ERROR);
+                    System.out.println("in empty black team");
+                    response = gson.toJson(errorMessage);
+                } else {
+                    LoadGameMessage loadGameMessage = new LoadGameMessage(game, ServerMessage.ServerMessageType.LOAD_GAME);
+                    response = gson.toJson(loadGameMessage);
+                }
+
+                NotificationMessage notificationMessage = new NotificationMessage(username + " has joined the battle", ServerMessage.ServerMessageType.NOTIFICATION);
+                for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
+                    if (!loopConnection.authTokenString().equals(joinPlayerCommand.getAuthString())) {
+                        loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
+                    }
+                }
             } else {
-                LoadGameMessage loadGameMessage = new LoadGameMessage(game, ServerMessage.ServerMessageType.LOAD_GAME);
-                response = gson.toJson(loadGameMessage);
+                ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID, auth token, or tried to play as team you didn't initially pick", ServerMessage.ServerMessageType.ERROR);
+                response = gson.toJson(errorMessage);
             }
         }
 

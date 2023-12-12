@@ -14,7 +14,6 @@ import typeAdapters.ChessGameAdapter;
 import ui.EscapeSequences;
 
 import com.google.gson.Gson;
-import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 import javax.websocket.*;
@@ -196,10 +195,15 @@ public class Client extends Endpoint {
                         } else {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Successfully joined as observer" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                             client.setInGameStatus(true);
-                            ChessGame newGame = new ChessGameImpl();
-                            client.redrawBoardBlack(newGame);
-                            System.out.print("\n");
-                            client.redrawBoardWhite(newGame);
+
+                            JoinObserverCommand joinObserverCommand = new JoinObserverCommand(gameID, client.getAuthToken().authToken(), UserGameCommand.CommandType.JOIN_OBSERVER);
+                            String command = gson.toJson(joinObserverCommand);
+                            client.send(command);
+
+//                            ChessGame newGame = new ChessGameImpl();
+//                            client.redrawBoardBlack(newGame);
+//                            System.out.print("\n");
+//                            client.redrawBoardWhite(newGame);
                         }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
