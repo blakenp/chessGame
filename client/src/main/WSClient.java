@@ -1,3 +1,8 @@
+import chess.ChessGame;
+import com.google.gson.Gson;
+import webSocketMessages.userCommands.JoinPlayerCommand;
+import webSocketMessages.userCommands.UserGameCommand;
+
 import javax.websocket.*;
 import java.net.URI;
 import java.util.Scanner;
@@ -9,9 +14,12 @@ public class WSClient extends Endpoint {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Enter a message you want to echo");
-        while (true) {
-            ws.send(scanner.nextLine());
-        }
+        JoinPlayerCommand joinPlayerCommand = new JoinPlayerCommand(1, ChessGame.TeamColor.WHITE, UserGameCommand.CommandType.JOIN_PLAYER, "adf");
+//        ws.send(joinPlayerCommand);
+
+        String message = new Gson().toJson(joinPlayerCommand);
+//        System.out.println("Message, " + message);
+        ws.send(message);
     }
 
     public Session session;

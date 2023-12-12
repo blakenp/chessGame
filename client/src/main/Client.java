@@ -4,24 +4,33 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import chessImplementation.ChessGameImpl;
 import chessImplementation.ChessPositionImpl;
+import com.google.gson.JsonObject;
 import models.AuthToken;
 import models.Game;
 import requests.*;
 import responses.*;
 import ui.EscapeSequences;
 
+import com.google.gson.Gson;
+import webSocketMessages.serverMessages.LoadGameMessage;
+import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.*;
+import javax.websocket.*;
+import java.net.URI;
 import java.util.List;
 import java.util.Scanner;
 
-public class Client {
+public class Client extends Endpoint {
     private boolean isLoggedIn = false;
     private boolean isStillUsing = true;
     private boolean isInGame = false;
     private AuthToken authToken;
+    private String username;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Client client = new Client();
         Scanner scanner = new Scanner(System.in);
+        Gson gson = new Gson();
 
         System.out.println(EscapeSequences.BLACK_KING + " Welcome to 240 chess. Type help to get started." + EscapeSequences.BLACK_KING);
         while (client.getUsingStatus()) {
@@ -60,6 +69,7 @@ public class Client {
                         String password = commandArgs[2];
                         String email = commandArgs[3];
 
+                        client.setUsername(username);
                         RegisterRequest registerRequest = new RegisterRequest(username, password, email);
                         RegisterResponse registerResponse = ServerFacade.handleClientRegister(registerRequest);
                         if (registerResponse.getMessage() != null) {
@@ -79,6 +89,7 @@ public class Client {
                         String username = commandArgs[1];
                         String password = commandArgs[2];
 
+                        client.setUsername(username);
                         LoginRequest loginRequest = new LoginRequest(username, password);
                         LoginResponse loginResponse = ServerFacade.handleClientLogin(loginRequest);
                         if (loginResponse.getMessage() != null) {
@@ -155,10 +166,15 @@ public class Client {
                             } else {
                                 System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW  + joinGameResponse.getMessage() + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                                 client.setInGameStatus(true);
-                                ChessGame newGame = new ChessGameImpl();
-                                client.redrawBoardBlack(newGame);
-                                System.out.print("\n");
-                                client.redrawBoardWhite(newGame);
+
+                                JoinPlayerCommand joinPlayerCommand = new JoinPlayerCommand(gameID, teamColor, UserGameCommand.CommandType.JOIN_PLAYER, client.getAuthToken().authToken());
+                                String command = gson.toJson(joinPlayerCommand);
+                                client.send(command);
+
+//                                ChessGame newGame = new ChessGameImpl();
+//                                client.redrawBoardBlack(newGame);
+//                                System.out.print("\n");
+//                                client.redrawBoardWhite(newGame);
                             }
                         } catch (NumberFormatException exception) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Game ID must be a number");
@@ -219,9 +235,53 @@ public class Client {
         System.exit(0);
     }
 
+    public Session session;
+
+    public Client() throws Exception {
+        URI uri = new URI("ws://localhost:8080/connect");
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        this.session = container.connectToServer(this, uri);
+
+        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            public void onMessage(String message) {
+                Gson gson = new Gson();
+                System.out.println(message);
+
+                JsonObject jsonObject = gson.fromJson(message, JsonObject.class);
+                ServerMessage.ServerMessageType serverMessageType = ServerMessage.ServerMessageType.valueOf(jsonObject.get("serverMessageType").getAsString());
+                System.out.println("\nserver message parsed");
+
+                System.out.println("before load check\n");
+                if (serverMessageType == ServerMessage.ServerMessageType.LOAD_GAME) {
+                    System.out.println("In load game check\n");
+                    try {
+                        LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
+                        System.out.println("hello?");
+                        Game game = loadGameMessage.getGame();
+
+                        System.out.println("username: " + getUsername());
+
+                        if (game.whiteUsername().equals(getUsername())) {
+                            redrawBoardWhite(game.game());
+                        } else {
+                            redrawBoardBlack(game.game());
+                        }
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    public void send(String msg) throws Exception {
+        this.session.getBasicRemote().sendText(msg);
+    }
+
     private boolean getUsingStatus() {
         return isStillUsing;
     }
+
     private void setUsingStatus(boolean status) {
         this.isStillUsing = status;
     }
@@ -240,6 +300,14 @@ public class Client {
 
     private void setAuthToken(AuthToken authToken) {
         this.authToken = authToken;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    private void setUsername(String username) {
+        this.username = username;
     }
 
     private boolean getInGameStatus() {
@@ -402,5 +470,9 @@ public class Client {
 
         boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
         System.out.println(boardString);
+    }
+
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 }
