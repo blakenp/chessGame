@@ -142,7 +142,7 @@ public class GameDAO implements DAO<Game> {
                 preparedStatement.setString(2, game.whiteUsername());
                 preparedStatement.setString(3, game.blackUsername());
                 preparedStatement.setString(4, game.gameName());
-                preparedStatement.setString(5, gson.toJson(game.game()));
+                preparedStatement.setString(5, gson.toJson(game.chessGame()));
 
                 preparedStatement.executeUpdate();
             }
@@ -181,7 +181,7 @@ public class GameDAO implements DAO<Game> {
                 preparedStatement.setString(2, game.whiteUsername());
                 preparedStatement.setString(3, game.blackUsername());
                 preparedStatement.setString(4, game.gameName());
-                preparedStatement.setString(5, gson.toJson(game.game()));
+                preparedStatement.setString(5, gson.toJson(game.chessGame()));
                 preparedStatement.setString(6, game.gameName());
 
                 preparedStatement.executeUpdate();

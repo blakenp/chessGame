@@ -95,10 +95,10 @@ public class GameService {
 
             // join as white or black team player if those options are still not taken. Else, throw an error
             if (request.playerColor() == ChessGame.TeamColor.WHITE && storedGame.whiteUsername() == null) {
-                updatedGame = new Game(storedGame.gameID(), user.username(), storedGame.blackUsername(), storedGame.gameName(), storedGame.game());
+                updatedGame = new Game(storedGame.gameID(), user.username(), storedGame.blackUsername(), storedGame.gameName(), storedGame.chessGame());
             }
             else if (request.playerColor() == ChessGame.TeamColor.BLACK && storedGame.blackUsername() == null) {
-                updatedGame = new Game(storedGame.gameID(), storedGame.whiteUsername(), user.username(), storedGame.gameName(), storedGame.game());
+                updatedGame = new Game(storedGame.gameID(), storedGame.whiteUsername(), user.username(), storedGame.gameName(), storedGame.chessGame());
             } else {
                 return new JoinGameResponse("Error: already taken");
             }

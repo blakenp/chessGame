@@ -4,11 +4,13 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import chessImplementation.ChessGameImpl;
 import chessImplementation.ChessPositionImpl;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import models.AuthToken;
 import models.Game;
 import requests.*;
 import responses.*;
+import typeAdapters.ChessGameAdapter;
 import ui.EscapeSequences;
 
 import com.google.gson.Gson;
@@ -249,25 +251,21 @@ public class Client extends Endpoint {
 
                 JsonObject jsonObject = gson.fromJson(message, JsonObject.class);
                 ServerMessage.ServerMessageType serverMessageType = ServerMessage.ServerMessageType.valueOf(jsonObject.get("serverMessageType").getAsString());
-                System.out.println("\nserver message parsed");
 
-                System.out.println("before load check\n");
                 if (serverMessageType == ServerMessage.ServerMessageType.LOAD_GAME) {
-                    System.out.println("In load game check\n");
-                    try {
-                        LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
-                        System.out.println("hello?");
-                        Game game = loadGameMessage.getGame();
+                    JsonObject gameObject = jsonObject.getAsJsonObject("game");
+                    JsonObject jsonChessGame = gameObject.get("chessGame").getAsJsonObject();
+                    String whiteUsername = String.valueOf(gameObject.get("whiteUsername").getAsString());
 
-                        System.out.println("username: " + getUsername());
+                    var builder = new GsonBuilder();
+                    builder.registerTypeAdapter(ChessGame.class, new ChessGameAdapter());
 
-                        if (game.whiteUsername().equals(getUsername())) {
-                            redrawBoardWhite(game.game());
-                        } else {
-                            redrawBoardBlack(game.game());
-                        }
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
+                    ChessGame chessGame = builder.create().fromJson(jsonChessGame, ChessGame.class);
+
+                    if (whiteUsername.equals(getUsername())) {
+                        redrawBoardWhite(chessGame);
+                    } else {
+                        redrawBoardBlack(chessGame);
                     }
                 }
             }
