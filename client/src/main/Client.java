@@ -163,6 +163,7 @@ public class Client extends Endpoint {
                                 teamColor = ChessGame.TeamColor.BLACK;
                             }
 
+                            client.setPlayerColor(teamColor);
                             JoinGameRequest joinGameRequest = new JoinGameRequest(teamColor, gameID, client.getAuthToken().authToken());
                             JoinGameResponse joinGameResponse = ServerFacade.handleClientJoinGame(joinGameRequest);
                             if (joinGameResponse.getMessage().startsWith("Error")) {
@@ -194,7 +195,7 @@ public class Client extends Endpoint {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Successfully joined as observer" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                             client.setInGameStatus(true);
 
-                            JoinObserverCommand joinObserverCommand = new JoinObserverCommand(gameID, client.getAuthToken().authToken(), UserGameCommand.CommandType.JOIN_OBSERVER);
+                            JoinObserverCommand joinObserverCommand = new JoinObserverCommand(gameID, client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.JOIN_OBSERVER);
                             String command = gson.toJson(joinObserverCommand);
                             client.send(command);
                         }
@@ -263,6 +264,11 @@ public class Client extends Endpoint {
                     if (whiteUsername != null && whiteUsername.equals(getUsername())) {
                         redrawBoardWhite(chessGame);
                     } else if (blackUsername != null && blackUsername.equals(getUsername())){
+                        redrawBoardBlack(chessGame);
+                    } else if (whiteUsername != null && blackUsername != null) {
+                        // this is for observers who join, so they can see both boards
+                        redrawBoardWhite(chessGame);
+                        System.out.println("\n");
                         redrawBoardBlack(chessGame);
                     }
                 } else if (serverMessageType == ServerMessage.ServerMessageType.NOTIFICATION) {

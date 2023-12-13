@@ -120,6 +120,37 @@ public class Server {
                 ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID, auth token, or other error has occurred", ServerMessage.ServerMessageType.ERROR);
                 response = gson.toJson(errorMessage);
             }
+        } else if (commandType == UserGameCommand.CommandType.JOIN_OBSERVER) {
+            JoinObserverCommand joinObserverCommand = gson.fromJson(message, JoinObserverCommand.class);
+
+            Game game = WSService.handleJoinObserverCommand(joinObserverCommand);
+
+            if (game != null) {
+                Connection connection = new Connection(joinObserverCommand.getAuthString(), session);
+                connectionMap.put(joinObserverCommand.getAuthString(), connection);
+
+                Set<Connection> gameConnections = connectionsToGames.get(game.gameID());
+                if (gameConnections == null) {
+                    gameConnections = new HashSet<>();
+                    connectionsToGames.put(game.gameID(), gameConnections);
+                }
+                gameConnections.add(connection);
+
+                String username = joinObserverCommand.getUsername();
+
+                LoadGameMessage loadGameMessage = new LoadGameMessage(game, ServerMessage.ServerMessageType.LOAD_GAME);
+                response = gson.toJson(loadGameMessage);
+
+                NotificationMessage notificationMessage = new NotificationMessage(username + " is observing your every moves bros. Tread carefully...", ServerMessage.ServerMessageType.NOTIFICATION);
+                for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
+                    if (!loopConnection.authTokenString().equals(joinObserverCommand.getAuthString())) {
+                        loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
+                    }
+                }
+            } else {
+                ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID, auth token, or other error has occurred", ServerMessage.ServerMessageType.ERROR);
+                response = gson.toJson(errorMessage);
+            }
         }
 
         session.getRemote().sendString(response);
