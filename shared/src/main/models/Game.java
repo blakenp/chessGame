@@ -10,8 +10,9 @@ import chess.ChessGame;
  * @param blackUsername Data field representing a game's black team player's username
  * @param gameName      Data field representing a game's name
  * @param chessGame          Data field representing the chess game of the Game object
+ * @param isFinished    Data field representing a game's state
  */
-public record Game(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame chessGame) {
+public record Game(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame chessGame, boolean isFinished) {
     /**
      * Game object constructor that will have a game ID and the usernames of the players playing, the name of the game,
      * and the object representing the chess game with its board itself
@@ -73,5 +74,9 @@ public record Game(int gameID, String whiteUsername, String blackUsername, Strin
     @Override
     public ChessGame chessGame() {
         return chessGame;
+    }
+
+    public Game setFinished(boolean isFinished) {
+        return new Game(gameID, whiteUsername, blackUsername, gameName, chessGame, isFinished);
     }
 }

@@ -153,7 +153,7 @@ public class StandardDAOTests {
     @DisplayName("Successful GameDAO game creation")
     public void successCreateGame() throws DataAccessException {
         ChessGame game = new ChessGameImpl();
-        Game testGame = new Game(1234, null, null, "Adventure Time!", game);
+        Game testGame = new Game(1234, null, null, "Adventure Time!", game, false);
         gameDAO.post(testGame);
         assertNotNull(gameDAO.get(testGame), "After creating a game, fetching it from the database should not return null when accessing added game");
     }
@@ -162,8 +162,8 @@ public class StandardDAOTests {
     @DisplayName("Negative GameDAO game creation")
     public void negativeCreateGame() throws DataAccessException {
         ChessGame game = new ChessGameImpl();
-        Game testGame = new Game(1234, null, null, "Adventure Time!", game);
-        Game testGame1 = new Game(1234, null, null, "Adventure Time!", game);
+        Game testGame = new Game(1234, null, null, "Adventure Time!", game, false);
+        Game testGame1 = new Game(1234, null, null, "Adventure Time!", game, false);
         gameDAO.post(testGame);
         assertThrows(DataAccessException.class, () -> gameDAO.post(testGame1), "Trying to create a game with the same name twice should throw an exception");
     }
@@ -172,7 +172,7 @@ public class StandardDAOTests {
     @DisplayName("Successful GameDAO game fetch")
     public void successFetchGame() throws DataAccessException {
         ChessGame game = new ChessGameImpl();
-        Game testGame = new Game(1234, null, null, "Adventure Time!", game);
+        Game testGame = new Game(1234, null, null, "Adventure Time!", game, false);
         gameDAO.post(testGame);
         assertEquals(gameDAO.get(testGame).gameName(), testGame.gameName(), "After creating a game, fetching it from the database should return a game with the same game name as the added game");
     }
@@ -181,8 +181,8 @@ public class StandardDAOTests {
     @DisplayName("Negative GameDAO game fetch")
     public void negativeFetchGame() throws DataAccessException {
         ChessGame game = new ChessGameImpl();
-        Game testGame = new Game(1234, null, null, "Adventure Time!", game);
-        Game testGame1 = new Game(1256, null, null, "The Best Game!", game);
+        Game testGame = new Game(1234, null, null, "Adventure Time!", game, false);
+        Game testGame1 = new Game(1256, null, null, "The Best Game!", game, false);
         gameDAO.post(testGame);
         assertThrows(DataAccessException.class, () -> gameDAO.get(testGame1), "Trying to access a game that was never added should throw an exception");
     }
@@ -191,9 +191,9 @@ public class StandardDAOTests {
     @DisplayName("Successful GameDAO game fetch all")
     public void successFetchAllGames() throws DataAccessException {
         ChessGame game = new ChessGameImpl();
-        Game testGame = new Game(1234, null, null, "Adventure Time!", game);
-        Game testGame1 = new Game(1256, null, null, "Dinner is Ready!", game);
-        Game testGame2 = new Game(1256456, null, null, "I'm Tired!", game);
+        Game testGame = new Game(1234, null, null, "Adventure Time!", game, false);
+        Game testGame1 = new Game(1256, null, null, "Dinner is Ready!", game, false);
+        Game testGame2 = new Game(1256456, null, null, "I'm Tired!", game, false);
         gameDAO.post(testGame);
         gameDAO.post(testGame1);
         gameDAO.post(testGame2);
@@ -211,8 +211,8 @@ public class StandardDAOTests {
     @DisplayName("Successful GameDAO game update")
     public void successUpdateGame() throws DataAccessException {
         ChessGame game = new ChessGameImpl();
-        Game testGame = new Game(1234, null, null, "Adventure Time!", game);
-        Game updatedGame = new Game(1234, "Mario", null, "Adventure Time!", game);
+        Game testGame = new Game(1234, null, null, "Adventure Time!", game, false);
+        Game updatedGame = new Game(1234, "Mario", null, "Adventure Time!", game, false);
         gameDAO.post(testGame);
         gameDAO.put(updatedGame);
 
@@ -223,8 +223,8 @@ public class StandardDAOTests {
     @DisplayName("Negative GameDAO game update")
     public void negativeUpdateGame() throws DataAccessException {
         ChessGame game = new ChessGameImpl();
-        Game testGame = new Game(1234, null, null, "Adventure Time!", game);
-        Game updatedGame = new Game(1234, "Mario", null, "Adventure Time Boy!", game);
+        Game testGame = new Game(1234, null, null, "Adventure Time!", game, false);
+        Game updatedGame = new Game(1234, "Mario", null, "Adventure Time Boy!", game, false);
         gameDAO.post(testGame);
 
         assertThrows(DataAccessException.class, () -> gameDAO.put(updatedGame), "Trying to update a game that isn't stored in the database should throw an error");
@@ -234,9 +234,9 @@ public class StandardDAOTests {
     @DisplayName("Successful GameDAO games clear")
     public void successClearGames() throws DataAccessException {
         ChessGame game = new ChessGameImpl();
-        Game testGame = new Game(1234, null, null, "Adventure Time!", game);
-        Game testGame1 = new Game(1256, null, null, "Dinner is Ready!", game);
-        Game testGame2 = new Game(1256456, null, null, "I'm Tired!", game);
+        Game testGame = new Game(1234, null, null, "Adventure Time!", game, false);
+        Game testGame1 = new Game(1256, null, null, "Dinner is Ready!", game, false);
+        Game testGame2 = new Game(1256456, null, null, "I'm Tired!", game, false);
         gameDAO.post(testGame);
         gameDAO.post(testGame1);
         gameDAO.post(testGame2);
@@ -249,9 +249,9 @@ public class StandardDAOTests {
     @DisplayName("Successful GameDAO games clear")
     public void successClearDatabase() throws DataAccessException {
         ChessGame game = new ChessGameImpl();
-        Game testGame = new Game(1234, null, null, "Adventure Time!", game);
-        Game testGame1 = new Game(1256, null, null, "Dinner is Ready!", game);
-        Game testGame2 = new Game(1256456, null, null, "I'm Tired!", game);
+        Game testGame = new Game(1234, null, null, "Adventure Time!", game, false);
+        Game testGame1 = new Game(1256, null, null, "Dinner is Ready!", game, false);
+        Game testGame2 = new Game(1256456, null, null, "I'm Tired!", game, false);
         gameDAO.post(testGame);
         gameDAO.post(testGame1);
         gameDAO.post(testGame2);

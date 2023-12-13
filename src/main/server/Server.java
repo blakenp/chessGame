@@ -1,7 +1,6 @@
 package server;
 
 import chess.ChessGame;
-import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import chessImplementation.ChessMoveImpl;
@@ -15,7 +14,6 @@ import spark.Spark;
 import handlers.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
-import typeAdapters.ChessGameAdapter;
 import typeAdapters.ChessPieceAdapter;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
@@ -212,11 +210,40 @@ public class Server {
                     }
                 }
             } else {
+                ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID, auth token, wrong turn, or you can't make moves as an observer", ServerMessage.ServerMessageType.ERROR);
+                response = gson.toJson(errorMessage);
+            }
+        } else if (commandType == UserGameCommand.CommandType.RESIGN) {
+            ResignCommand resignCommand = gson.fromJson(message, ResignCommand.class);
+
+            Game game = WSService.handleResignCommand(resignCommand);
+
+            if (game != null) {
+                Connection connection = new Connection(resignCommand.getAuthString(), session);
+                connectionMap.put(resignCommand.getAuthString(), connection);
+
+                Set<Connection> gameConnections = connectionsToGames.get(game.gameID());
+                if (gameConnections == null) {
+                    gameConnections = new HashSet<>();
+                    connectionsToGames.put(game.gameID(), gameConnections);
+                }
+                gameConnections.add(connection);
+
+                String username = resignCommand.getUsername();
+
+                NotificationMessage notificationMessage = new NotificationMessage(username + " has resigned and will be missed...", ServerMessage.ServerMessageType.NOTIFICATION);
+                for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
+                    loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
+                }
+            } else {
                 ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID, auth token, or other error has occurred", ServerMessage.ServerMessageType.ERROR);
                 response = gson.toJson(errorMessage);
             }
         }
 
-        session.getRemote().sendString(response);
+        // only send the other response type if the command type received from the client was not a resign or leave command
+        if (commandType != UserGameCommand.CommandType.RESIGN && commandType != UserGameCommand.CommandType.LEAVE) {
+            session.getRemote().sendString(response);
+        }
     }
 }

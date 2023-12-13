@@ -40,7 +40,7 @@ public class GameDAO implements DAO<Game> {
         var database = new Database();
 
         try (var connection = database.getConnection()) {
-            String sql = "SELECT game_id, white_username, black_username, game_name, chess_game FROM game WHERE game_id = ?";
+            String sql = "SELECT game_id, white_username, black_username, game_name, chess_game, game_state FROM game WHERE game_id = ?";
 
             try (var preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setInt(1, game.gameID());
@@ -52,6 +52,7 @@ public class GameDAO implements DAO<Game> {
                         var blackUsername = resultSet.getString("black_username");
                         var gameName = resultSet.getString("game_name");
                         var jsonChessGame = resultSet.getString("chess_game");
+                        var gameState = resultSet.getBoolean("game_state");
 
                         // deserialize JSON representation of chess game stored in Database to get it back to
                         // it's concrete class/object representation
@@ -60,7 +61,7 @@ public class GameDAO implements DAO<Game> {
 
                         ChessGame chessGame = builder.create().fromJson(jsonChessGame, ChessGame.class);
 
-                        return new Game(gameID, whiteUsername, blackUsername, gameName, chessGame);
+                        return new Game(gameID, whiteUsername, blackUsername, gameName, chessGame, gameState);
                     }
                 }
             }
@@ -82,7 +83,7 @@ public class GameDAO implements DAO<Game> {
         var database = new Database();
 
         try (var connection = database.getConnection()) {
-            String sql = "SELECT game_id, white_username, black_username, game_name, chess_game FROM game";
+            String sql = "SELECT game_id, white_username, black_username, game_name, chess_game, game_state FROM game";
 
             try (var preparedStatement = connection.prepareStatement(sql)) {
 
@@ -93,6 +94,7 @@ public class GameDAO implements DAO<Game> {
                         var blackUsername = resultSet.getString("black_username");
                         var gameName = resultSet.getString("game_name");
                         var jsonChessGame = resultSet.getString("chess_game");
+                        var gameState = resultSet.getBoolean("game_state");
 
                         // deserialize JSON representation of chess game stored in Database to get it back to
                         // it's concrete class/object representation
@@ -101,7 +103,7 @@ public class GameDAO implements DAO<Game> {
 //
 //                        ChessGame chessGame = builder.create().fromJson(jsonChessGame, ChessGame.class);
 
-                        gamesList.add(new Game(gameID, whiteUsername, blackUsername, gameName, null));
+                        gamesList.add(new Game(gameID, whiteUsername, blackUsername, gameName, null, gameState));
                     }
                 }
             }
@@ -135,7 +137,7 @@ public class GameDAO implements DAO<Game> {
                 }
             }
 
-            String sql = "INSERT INTO game (game_id, white_username, black_username, game_name, chess_game) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO game (game_id, white_username, black_username, game_name, chess_game, game_state) VALUES (?, ?, ?, ?, ?, ?)";
 
             try (var preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setInt(1, game.gameID());
@@ -143,6 +145,7 @@ public class GameDAO implements DAO<Game> {
                 preparedStatement.setString(3, game.blackUsername());
                 preparedStatement.setString(4, game.gameName());
                 preparedStatement.setString(5, gson.toJson(game.chessGame()));
+                preparedStatement.setBoolean(6, game.isFinished());
 
                 preparedStatement.executeUpdate();
             }
@@ -163,7 +166,7 @@ public class GameDAO implements DAO<Game> {
 
         try (var connection = database.getConnection()) {
             // check if the game with specified game name exists in the database. If it doesn't, then an exception will be thrown
-            try (var preparedStatement = connection.prepareStatement("SELECT game_id, white_username, black_username, game_name, chess_game FROM game WHERE game_name = ?")) {
+            try (var preparedStatement = connection.prepareStatement("SELECT game_id, white_username, black_username, game_name, chess_game, game_state FROM game WHERE game_name = ?")) {
                 preparedStatement.setString(1, game.gameName());
 
                 try (var resultSet = preparedStatement.executeQuery()) {
@@ -174,7 +177,7 @@ public class GameDAO implements DAO<Game> {
                 }
             }
 
-            String sql = "UPDATE game SET game_id = ?, white_username = ?, black_username = ?, game_name = ?, chess_game = ? WHERE game_name = ?";
+            String sql = "UPDATE game SET game_id = ?, white_username = ?, black_username = ?, game_name = ?, chess_game = ?, game_state = ? WHERE game_name = ?";
 
             try (var preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setInt(1, game.gameID());
@@ -182,7 +185,8 @@ public class GameDAO implements DAO<Game> {
                 preparedStatement.setString(3, game.blackUsername());
                 preparedStatement.setString(4, game.gameName());
                 preparedStatement.setString(5, gson.toJson(game.chessGame()));
-                preparedStatement.setString(6, game.gameName());
+                preparedStatement.setBoolean(6, game.isFinished());
+                preparedStatement.setString(7, game.gameName());
 
                 preparedStatement.executeUpdate();
             }
