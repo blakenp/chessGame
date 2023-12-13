@@ -1,6 +1,7 @@
 package server;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import chessImplementation.ChessMoveImpl;
@@ -14,6 +15,7 @@ import spark.Spark;
 import handlers.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
+import typeAdapters.ChessMoveAdapter;
 import typeAdapters.ChessPieceAdapter;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
@@ -82,7 +84,9 @@ public class Server {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
-        Gson gson = new Gson();
+        var builder = new GsonBuilder();
+        builder.registerTypeAdapter(ChessMove.class, new ChessMoveAdapter());
+        Gson gson = builder.create();
         String response = "";
 
         JsonObject jsonObject = gson.fromJson(message, JsonObject.class);
@@ -158,29 +162,35 @@ public class Server {
                 response = gson.toJson(errorMessage);
             }
         } else if (commandType == UserGameCommand.CommandType.MAKE_MOVE) {
+            System.out.println("Make Move Command JSON: " + message);
+
+            ChessMove chessMove = gson.fromJson(message, ChessMove.class);
+
             MakeMoveCommand makeMoveCommand = gson.fromJson(message, MakeMoveCommand.class);
 
-            JsonObject moveObject = jsonObject.getAsJsonObject("move");
-            JsonObject jsonStartPosition = moveObject.getAsJsonObject("startPosition");
-            JsonObject jsonEndPosition = moveObject.getAsJsonObject("endPosition");
-            JsonObject jsonPromotionPiece = moveObject.has("promotionPiece") ? moveObject.getAsJsonObject("promotionPiece") : null;
-            ChessPiece promotionPiece = null;
+            makeMoveCommand.setChessMove(chessMove);
 
-            if (jsonPromotionPiece != null) {
-                var builder = new GsonBuilder();
-                builder.registerTypeAdapter(ChessPiece.class, new ChessPieceAdapter());
-
-                promotionPiece = builder.create().fromJson(jsonEndPosition, ChessPiece.class);
-            }
-
-            ChessPosition extractedStartPosition = new ChessPositionImpl(jsonStartPosition.getAsJsonPrimitive("row").getAsInt(), jsonStartPosition.getAsJsonPrimitive("col").getAsInt());
-            ChessPosition extractedEndPosition = new ChessPositionImpl(jsonEndPosition.getAsJsonPrimitive("row").getAsInt(), jsonEndPosition.getAsJsonPrimitive("col").getAsInt());
-
-            if (promotionPiece != null) {
-                makeMoveCommand.setChessMove(new ChessMoveImpl(extractedStartPosition, extractedEndPosition, promotionPiece.getPieceType()));
-            } else {
-                makeMoveCommand.setChessMove(new ChessMoveImpl(extractedStartPosition, extractedEndPosition, null));
-            }
+//            JsonObject moveObject = jsonObject.getAsJsonObject("move");
+//            JsonObject jsonStartPosition = moveObject.getAsJsonObject("startPosition");
+//            JsonObject jsonEndPosition = moveObject.getAsJsonObject("endPosition");
+//            JsonObject jsonPromotionPiece = moveObject.has("promotionPiece") ? moveObject.getAsJsonObject("promotionPiece") : null;
+//            ChessPiece promotionPiece = null;
+//
+//            if (jsonPromotionPiece != null) {
+//                var builder = new GsonBuilder();
+//                builder.registerTypeAdapter(ChessPiece.class, new ChessPieceAdapter());
+//
+//                promotionPiece = builder.create().fromJson(jsonPromotionPiece, ChessPiece.class);
+//            }
+//
+//            ChessPosition extractedStartPosition = new ChessPositionImpl(jsonStartPosition.getAsJsonPrimitive("row").getAsInt(), jsonStartPosition.getAsJsonPrimitive("col").getAsInt());
+//            ChessPosition extractedEndPosition = new ChessPositionImpl(jsonEndPosition.getAsJsonPrimitive("row").getAsInt(), jsonEndPosition.getAsJsonPrimitive("col").getAsInt());
+//
+//            if (promotionPiece != null) {
+//                makeMoveCommand.setChessMove(new ChessMoveImpl(extractedStartPosition, extractedEndPosition, promotionPiece.getPieceType()));
+//            } else {
+//                makeMoveCommand.setChessMove(new ChessMoveImpl(extractedStartPosition, extractedEndPosition, null));
+//            }
             Game game = WSService.handleMakeMoveCommand(makeMoveCommand);
 
             if (game != null) {

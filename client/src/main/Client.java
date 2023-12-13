@@ -1,8 +1,6 @@
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import chessImplementation.ChessGameImpl;
+import chessImplementation.ChessMoveImpl;
 import chessImplementation.ChessPositionImpl;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -27,9 +25,12 @@ public class Client extends Endpoint {
     private boolean isLoggedIn = false;
     private boolean isStillUsing = true;
     private boolean isInGame = false;
+    private boolean isObserver = false;
     private AuthToken authToken;
     private String username;
     private ChessGame.TeamColor playerColor;
+    private Integer gameID;
+    private ChessGame chessGame;
 
     public static void main(String[] args) throws Exception {
         Client client = new Client();
@@ -43,14 +44,76 @@ public class Client extends Endpoint {
                 String userInput = scanner.nextLine();
 
                 if (userInput.startsWith("redraw")) {
-                    ChessGame newGame = new ChessGameImpl();
-                    client.redrawBoardBlack(newGame);
-                    System.out.print("\n");
-                    client.redrawBoardWhite(newGame);
+                    if (client.getPlayerColor() == ChessGame.TeamColor.WHITE) {
+                        client.redrawBoardWhite(client.getChessGame());
+                    } else if (client.getPlayerColor() == ChessGame.TeamColor.BLACK) {
+                        client.redrawBoardBlack(client.getChessGame());
+                    } else {
+                        client.redrawBoardWhite(client.getChessGame());
+                        System.out.println("\n");
+                        client.redrawBoardBlack(client.getChessGame());
+                    }
                 } else if (userInput.startsWith("highlight")) {
                     System.out.println("Logic for highlighting valid moves goes here");
                 } else if (userInput.startsWith("move")) {
-                    System.out.println("Logic for making a move on the board goes here");
+                    String[] commandArgs = userInput.split(" ");
+                    if (commandArgs.length == 2) {
+                        String move = commandArgs[1];
+                        int stringLength = move.length();
+
+                        if (stringLength != 4) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid Move. Move syntax needs to have 2 cols and 2 rows specified (ie e2e4)" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                            continue;
+                        }
+
+                        String firstTwoChars = move.substring(0, 2);
+                        String lastTwoChars = move.substring(move.length() - 2);
+
+                        if ((firstTwoChars.charAt(0) > 'h' && firstTwoChars.charAt(0) <= 'z') && (lastTwoChars.charAt(0) > 'h' && lastTwoChars.charAt(0) <= 'z')) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid Move. Column indices only range from a-h" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                        }
+
+                        ChessPosition startPosition = new ChessPositionImpl((firstTwoChars.charAt(0) - 'a') + 1, Character.getNumericValue(firstTwoChars.charAt(1)));
+                        ChessPosition endPosition = new ChessPositionImpl((lastTwoChars.charAt(0) - 'a') + 1, Character.getNumericValue(lastTwoChars.charAt(1)));
+                        ChessPiece.PieceType promotionPiece = null;
+
+                        if (endPosition.getRow() + 1 == 8 && client.getPlayerColor() == ChessGame.TeamColor.WHITE && client.getChessGame().getBoard().getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA + "Select promotion piece for pawn. Options are " + EscapeSequences.SET_TEXT_COLOR_YELLOW + " QUEEN, BISHOP, ROOK, KNIGHT");
+                            String decision = scanner.nextLine();
+                            
+                            if (decision.equalsIgnoreCase("queen")) {
+                                promotionPiece = ChessPiece.PieceType.QUEEN;
+                            } else if (decision.equalsIgnoreCase("bishop")) {
+                                promotionPiece = ChessPiece.PieceType.BISHOP;
+                            } else if (decision.equalsIgnoreCase("rook")) {
+                                promotionPiece = ChessPiece.PieceType.ROOK;
+                            } else if (decision.equalsIgnoreCase("knight")) {
+                                promotionPiece = ChessPiece.PieceType.KNIGHT;
+                            } else {
+                                promotionPiece = ChessPiece.PieceType.QUEEN;
+                            }
+                        } else if (endPosition.getRow() - 1 == 1 && client.getPlayerColor() == ChessGame.TeamColor.BLACK && client.getChessGame().getBoard().getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA + "Select promotion piece for pawn. Options are " + EscapeSequences.SET_TEXT_COLOR_YELLOW + " QUEEN, BISHOP, ROOK, KNIGHT");
+                            String decision = scanner.nextLine();
+
+                            if (decision.equalsIgnoreCase("queen")) {
+                                promotionPiece = ChessPiece.PieceType.QUEEN;
+                            } else if (decision.equalsIgnoreCase("bishop")) {
+                                promotionPiece = ChessPiece.PieceType.BISHOP;
+                            } else if (decision.equalsIgnoreCase("rook")) {
+                                promotionPiece = ChessPiece.PieceType.ROOK;
+                            } else if (decision.equalsIgnoreCase("knight")) {
+                                promotionPiece = ChessPiece.PieceType.KNIGHT;
+                            } else {
+                                promotionPiece = ChessPiece.PieceType.QUEEN;
+                            }
+                        }
+
+                        ChessMove chessMove = new ChessMoveImpl(startPosition, endPosition, promotionPiece);
+                        MakeMoveCommand makeMoveCommand = new MakeMoveCommand(client.getGameID(), chessMove, client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.MAKE_MOVE);
+                        String command = gson.toJson(makeMoveCommand);
+                        client.send(command);
+                    }
                 } else if (userInput.startsWith("resign")) {
                     System.out.println("Logic for resigning a game goes here");
                 } else if (userInput.startsWith("leave")) {
@@ -198,6 +261,7 @@ public class Client extends Endpoint {
                             JoinObserverCommand joinObserverCommand = new JoinObserverCommand(gameID, client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.JOIN_OBSERVER);
                             String command = gson.toJson(joinObserverCommand);
                             client.send(command);
+                            client.setObserver(true);
                         }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -245,7 +309,7 @@ public class Client extends Endpoint {
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) {
                 Gson gson = new Gson();
-                System.out.println(message);
+                System.out.println("\n");
 
                 JsonObject jsonObject = gson.fromJson(message, JsonObject.class);
                 ServerMessage.ServerMessageType serverMessageType = ServerMessage.ServerMessageType.valueOf(jsonObject.get("serverMessageType").getAsString());
@@ -260,6 +324,7 @@ public class Client extends Endpoint {
                     builder.registerTypeAdapter(ChessGame.class, new ChessGameAdapter());
 
                     ChessGame chessGame = builder.create().fromJson(jsonChessGame, ChessGame.class);
+                    setChessGame(chessGame);
 
                     if (whiteUsername != null && whiteUsername.equals(getUsername())) {
                         redrawBoardWhite(chessGame);
@@ -268,7 +333,7 @@ public class Client extends Endpoint {
                     } else if (whiteUsername != null && blackUsername != null) {
                         // this is for observers who join, so they can see both boards
                         redrawBoardWhite(chessGame);
-                        System.out.println("\n");
+                        System.out.println("\n" + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR);
                         redrawBoardBlack(chessGame);
                     }
                 } else if (serverMessageType == ServerMessage.ServerMessageType.NOTIFICATION) {
@@ -302,6 +367,14 @@ public class Client extends Endpoint {
         this.isLoggedIn = status;
     }
 
+    private boolean getObserverStatus() {
+        return isObserver;
+    }
+
+    private void setObserver(boolean status) {
+        this.isObserver = status;
+    }
+
     private AuthToken getAuthToken() {
         return authToken;
     }
@@ -324,6 +397,22 @@ public class Client extends Endpoint {
 
     private void setPlayerColor(ChessGame.TeamColor playerColor) {
         this.playerColor = playerColor;
+    }
+
+    private Integer getGameID() {
+        return gameID;
+    }
+
+    private void setGameID(Integer gameID) {
+        this.gameID = gameID;
+    }
+
+    public ChessGame getChessGame() {
+        return chessGame;
+    }
+
+    public void setChessGame(ChessGame chessGame) {
+        this.chessGame = chessGame;
     }
 
     private boolean getInGameStatus() {
