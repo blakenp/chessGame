@@ -14,6 +14,8 @@ import typeAdapters.ChessGameAdapter;
 import ui.EscapeSequences;
 
 import com.google.gson.Gson;
+import webSocketMessages.serverMessages.ErrorMessage;
+import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 import javax.websocket.*;
@@ -171,11 +173,6 @@ public class Client extends Endpoint {
                                 JoinPlayerCommand joinPlayerCommand = new JoinPlayerCommand(gameID, teamColor, UserGameCommand.CommandType.JOIN_PLAYER, client.getAuthToken().authToken());
                                 String command = gson.toJson(joinPlayerCommand);
                                 client.send(command);
-
-//                                ChessGame newGame = new ChessGameImpl();
-//                                client.redrawBoardBlack(newGame);
-//                                System.out.print("\n");
-//                                client.redrawBoardWhite(newGame);
                             }
                         } catch (NumberFormatException exception) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Game ID must be a number");
@@ -199,11 +196,6 @@ public class Client extends Endpoint {
                             JoinObserverCommand joinObserverCommand = new JoinObserverCommand(gameID, client.getAuthToken().authToken(), UserGameCommand.CommandType.JOIN_OBSERVER);
                             String command = gson.toJson(joinObserverCommand);
                             client.send(command);
-
-//                            ChessGame newGame = new ChessGameImpl();
-//                            client.redrawBoardBlack(newGame);
-//                            System.out.print("\n");
-//                            client.redrawBoardWhite(newGame);
                         }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -271,6 +263,12 @@ public class Client extends Endpoint {
                     } else {
                         redrawBoardBlack(chessGame);
                     }
+                } else if (serverMessageType == ServerMessage.ServerMessageType.NOTIFICATION) {
+                    NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
+                    System.out.println(notificationMessage.getMessage());
+                } else if (serverMessageType == ServerMessage.ServerMessageType.ERROR) {
+                    ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
+                    System.out.println(errorMessage.getErrorMessage());
                 }
             }
         });

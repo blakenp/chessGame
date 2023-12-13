@@ -81,7 +81,6 @@ public class Server {
 
         JsonObject jsonObject = gson.fromJson(message, JsonObject.class);
         UserGameCommand.CommandType commandType = UserGameCommand.CommandType.valueOf(jsonObject.get("commandType").getAsString());
-        System.out.println(commandType);
 
         if (commandType == UserGameCommand.CommandType.JOIN_PLAYER) {
             JoinPlayerCommand joinPlayerCommand = gson.fromJson(message, JoinPlayerCommand.class);
@@ -106,18 +105,8 @@ public class Server {
                     username = game.blackUsername();
                 }
 
-                if (teamColor == ChessGame.TeamColor.WHITE && game.whiteUsername().isEmpty()) {
-                    ErrorMessage errorMessage = new ErrorMessage("Error: game wasn't correctly updated to show you as team white player", ServerMessage.ServerMessageType.ERROR);
-                    System.out.println("in empty white team");
-                    response = gson.toJson(errorMessage);
-                } else if (teamColor == ChessGame.TeamColor.BLACK && game.blackUsername().isEmpty()) {
-                    ErrorMessage errorMessage = new ErrorMessage("Error: game wasn't correctly updated to show you as team black player", ServerMessage.ServerMessageType.ERROR);
-                    System.out.println("in empty black team");
-                    response = gson.toJson(errorMessage);
-                } else {
-                    LoadGameMessage loadGameMessage = new LoadGameMessage(game, ServerMessage.ServerMessageType.LOAD_GAME);
-                    response = gson.toJson(loadGameMessage);
-                }
+                LoadGameMessage loadGameMessage = new LoadGameMessage(game, ServerMessage.ServerMessageType.LOAD_GAME);
+                response = gson.toJson(loadGameMessage);
 
                 NotificationMessage notificationMessage = new NotificationMessage(username + " has joined the battle", ServerMessage.ServerMessageType.NOTIFICATION);
                 for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
@@ -126,7 +115,7 @@ public class Server {
                     }
                 }
             } else {
-                ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID, auth token, or tried to play as team you didn't initially pick", ServerMessage.ServerMessageType.ERROR);
+                ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID, auth token, or other error has occurred", ServerMessage.ServerMessageType.ERROR);
                 response = gson.toJson(errorMessage);
             }
         }
