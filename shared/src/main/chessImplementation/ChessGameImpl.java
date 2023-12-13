@@ -12,6 +12,7 @@ public class ChessGameImpl implements ChessGame {
     private ChessBoard tempBoard;
     private Set<ChessMove> validMoves = new HashSet<>();
     private Set<ChessMove> enemyValidMoves = new HashSet<>();
+    private boolean isFinished = false;
 
     public ChessGameImpl() {
         ChessBoard defaultBoard = new ChessBoardImpl();
@@ -227,5 +228,13 @@ public class ChessGameImpl implements ChessGame {
     @Override
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public void setFinished(boolean isFinished) {
+        this.isFinished = isFinished;
+    }
+
+    public boolean getFinished() {
+        return isFinished;
     }
 }

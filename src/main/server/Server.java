@@ -1,7 +1,13 @@
 package server;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
+import chessImplementation.ChessMoveImpl;
+import chessImplementation.ChessPositionImpl;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import models.Game;
 import services.WSService;
@@ -9,6 +15,8 @@ import spark.Spark;
 import handlers.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
+import typeAdapters.ChessGameAdapter;
+import typeAdapters.ChessPieceAdapter;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
@@ -145,6 +153,62 @@ public class Server {
                 for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
                     if (!loopConnection.authTokenString().equals(joinObserverCommand.getAuthString())) {
                         loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
+                    }
+                }
+            } else {
+                ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID, auth token, or other error has occurred", ServerMessage.ServerMessageType.ERROR);
+                response = gson.toJson(errorMessage);
+            }
+        } else if (commandType == UserGameCommand.CommandType.MAKE_MOVE) {
+            MakeMoveCommand makeMoveCommand = gson.fromJson(message, MakeMoveCommand.class);
+            System.out.println("Received JSON: " + message);
+
+            JsonObject moveObject = jsonObject.getAsJsonObject("move");
+            JsonObject jsonStartPosition = moveObject.getAsJsonObject("startPosition");
+            JsonObject jsonEndPosition = moveObject.getAsJsonObject("endPosition");
+            JsonObject jsonPromotionPiece = moveObject.has("promotionPiece") ? moveObject.getAsJsonObject("promotionPiece") : null;
+            ChessPiece promotionPiece = null;
+
+            if (jsonPromotionPiece != null) {
+                var builder = new GsonBuilder();
+                builder.registerTypeAdapter(ChessPiece.class, new ChessPieceAdapter());
+
+                promotionPiece = builder.create().fromJson(jsonEndPosition, ChessPiece.class);
+            }
+
+            ChessPosition extractedStartPosition = new ChessPositionImpl(jsonStartPosition.getAsJsonPrimitive("row").getAsInt(), jsonStartPosition.getAsJsonPrimitive("col").getAsInt());
+            ChessPosition extractedEndPosition = new ChessPositionImpl(jsonEndPosition.getAsJsonPrimitive("row").getAsInt(), jsonEndPosition.getAsJsonPrimitive("col").getAsInt());
+
+            if (promotionPiece != null) {
+                makeMoveCommand.setChessMove(new ChessMoveImpl(extractedStartPosition, extractedEndPosition, promotionPiece.getPieceType()));
+            } else {
+                makeMoveCommand.setChessMove(new ChessMoveImpl(extractedStartPosition, extractedEndPosition, null));
+            }
+            Game game = WSService.handleMakeMoveCommand(makeMoveCommand);
+
+            if (game != null) {
+                Connection connection = new Connection(makeMoveCommand.getAuthString(), session);
+                connectionMap.put(makeMoveCommand.getAuthString(), connection);
+
+                Set<Connection> gameConnections = connectionsToGames.get(game.gameID());
+                if (gameConnections == null) {
+                    gameConnections = new HashSet<>();
+                    connectionsToGames.put(game.gameID(), gameConnections);
+                }
+                gameConnections.add(connection);
+
+                String username = makeMoveCommand.getUsername();
+
+                LoadGameMessage loadGameMessage = new LoadGameMessage(game, ServerMessage.ServerMessageType.LOAD_GAME);
+                response = gson.toJson(loadGameMessage);
+
+                ChessPosition startPosition = makeMoveCommand.getChessMove().getStartPosition();
+                ChessPosition endPosition = makeMoveCommand.getChessMove().getEndPosition();
+                NotificationMessage notificationMessage = new NotificationMessage(username + " made the move (" + startPosition + ", " + endPosition + ")", ServerMessage.ServerMessageType.NOTIFICATION);
+                for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
+                    if (!loopConnection.authTokenString().equals(makeMoveCommand.getAuthString())) {
+                        loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
+                        loopConnection.session().getRemote().sendString(gson.toJson(loadGameMessage));
                     }
                 }
             } else {
