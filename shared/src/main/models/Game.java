@@ -79,4 +79,12 @@ public record Game(int gameID, String whiteUsername, String blackUsername, Strin
     public Game setFinished(boolean isFinished) {
         return new Game(gameID, whiteUsername, blackUsername, gameName, chessGame, isFinished);
     }
+
+    public Game removeWhite() {
+        return new Game(gameID, null, blackUsername, gameName, chessGame, isFinished);
+    }
+
+    public Game removeBlack() {
+        return new Game(gameID, whiteUsername, null, gameName, chessGame, isFinished);
+    }
 }

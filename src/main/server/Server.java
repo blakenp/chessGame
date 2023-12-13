@@ -159,7 +159,6 @@ public class Server {
             }
         } else if (commandType == UserGameCommand.CommandType.MAKE_MOVE) {
             MakeMoveCommand makeMoveCommand = gson.fromJson(message, MakeMoveCommand.class);
-            System.out.println("Received JSON: " + message);
 
             JsonObject moveObject = jsonObject.getAsJsonObject("move");
             JsonObject jsonStartPosition = moveObject.getAsJsonObject("startPosition");
@@ -237,11 +236,39 @@ public class Server {
                 }
             } else {
                 ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID, auth token, or other error has occurred", ServerMessage.ServerMessageType.ERROR);
-                response = gson.toJson(errorMessage);
+                session.getRemote().sendString(gson.toJson(errorMessage));
+            }
+        } else if (commandType == UserGameCommand.CommandType.LEAVE) {
+            LeaveCommand leaveCommand = gson.fromJson(message, LeaveCommand.class);
+
+            Game game = WSService.handleLeaveCommand(leaveCommand);
+
+            if (game != null) {
+                Connection connection = new Connection(leaveCommand.getAuthString(), session);
+                connectionMap.put(leaveCommand.getAuthString(), connection);
+
+                Set<Connection> gameConnections = connectionsToGames.get(game.gameID());
+                if (gameConnections == null) {
+                    gameConnections = new HashSet<>();
+                    connectionsToGames.put(game.gameID(), gameConnections);
+                }
+                gameConnections.remove(connection);
+
+                String username = leaveCommand.getUsername();
+
+                NotificationMessage notificationMessage = new NotificationMessage(username + " has left the game. NOOOOOOOO!!!!!", ServerMessage.ServerMessageType.NOTIFICATION);
+                for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
+                    if (!loopConnection.authTokenString().equals(leaveCommand.getAuthString())) {
+                        loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
+                    }
+                }
+            } else {
+                ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID, auth token, or other error has occurred", ServerMessage.ServerMessageType.ERROR);
+                session.getRemote().sendString(gson.toJson(errorMessage));
             }
         }
 
-        // only send the other response type if the command type received from the client was not a resign or leave command
+        // only send the other response type if the command type received from the client was not a resignation or leave command
         if (commandType != UserGameCommand.CommandType.RESIGN && commandType != UserGameCommand.CommandType.LEAVE) {
             session.getRemote().sendString(response);
         }

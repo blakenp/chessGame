@@ -1,7 +1,6 @@
 package services;
 
 import chess.ChessGame;
-import chess.ChessPiece;
 import chess.InvalidMoveException;
 import chessImplementation.ChessGameImpl;
 import dataAccess.AuthDAO;
@@ -9,10 +8,7 @@ import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import models.AuthToken;
 import models.Game;
-import webSocketMessages.userCommands.JoinObserverCommand;
-import webSocketMessages.userCommands.JoinPlayerCommand;
-import webSocketMessages.userCommands.MakeMoveCommand;
-import webSocketMessages.userCommands.ResignCommand;
+import webSocketMessages.userCommands.*;
 
 public class WSService {
     private static AuthDAO authDAO = AuthDAO.getInstance();
@@ -97,8 +93,6 @@ public class WSService {
             return null;
         }
 
-        System.out.println("finished state: " + game.isFinished());
-
         // if game state is already finished, then you can't make a move so return null and handle error in Server class
         if (game.isFinished()) {
             return null;
@@ -143,6 +137,7 @@ public class WSService {
 
     public static Game handleResignCommand(ResignCommand resignCommand) {
         Game game;
+        AuthToken authToken;
 
         Integer gameID = resignCommand.getGameID();
         Game storedGame = new Game(gameID, null, null, null, new ChessGameImpl(), false);
@@ -155,16 +150,63 @@ public class WSService {
             return null;
         }
 
+        // If someone else resigned previously, return null and handle error in Server class
+        if (game.isFinished()) {
+            return null;
+        }
+
         // return null if auth token not found in database so then error handling can be done in Server class
         try {
-            authDAO.get(storedAuthToken);
+            authToken = authDAO.get(storedAuthToken);
         } catch (DataAccessException dataAccessException) {
+            return null;
+        }
+
+        // if username extracted from auth token is not the same as the white or black usernames, then return null and handle error
+        // because observer is attempting to resign
+        if (!authToken.username().equals(game.whiteUsername()) && !authToken.username().equals(game.blackUsername())) {
             return null;
         }
 
         game = game.setFinished(true);
 
-        System.out.println("game state in resign function: " + game.isFinished());
+        // update the game in the database
+        try {
+            gameDAO.put(game);
+        } catch (DataAccessException dataAccessException) {
+            return null;
+        }
+
+        return game;
+    }
+
+    public static Game handleLeaveCommand(LeaveCommand leaveCommand) {
+        Game game;
+        AuthToken authToken;
+
+        Integer gameID = leaveCommand.getGameID();
+        Game storedGame = new Game(gameID, null, null, null, new ChessGameImpl(), false);
+        AuthToken storedAuthToken = new AuthToken(null, leaveCommand.getAuthString());
+
+        // return null for Server class to handle errors if game not found in database
+        try {
+            game = gameDAO.get(storedGame);
+        } catch (DataAccessException dataAccessException) {
+            return null;
+        }
+
+        // return null if auth token not found in database so then error handling can be done in Server class
+        try {
+            authToken = authDAO.get(storedAuthToken);
+        } catch (DataAccessException dataAccessException) {
+            return null;
+        }
+
+        if (game.whiteUsername() != null && authToken.username().equals(game.whiteUsername())) {
+            game = game.removeWhite();
+        } else if (game.blackUsername() != null && authToken.username().equals(game.blackUsername())) {
+            game = game.removeBlack();
+        }
 
         // update the game in the database
         try {
