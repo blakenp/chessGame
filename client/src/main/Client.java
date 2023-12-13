@@ -29,6 +29,7 @@ public class Client extends Endpoint {
     private boolean isInGame = false;
     private AuthToken authToken;
     private String username;
+    private ChessGame.TeamColor playerColor;
 
     public static void main(String[] args) throws Exception {
         Client client = new Client();
@@ -251,24 +252,25 @@ public class Client extends Endpoint {
                 if (serverMessageType == ServerMessage.ServerMessageType.LOAD_GAME) {
                     JsonObject gameObject = jsonObject.getAsJsonObject("game");
                     JsonObject jsonChessGame = gameObject.get("chessGame").getAsJsonObject();
-                    String whiteUsername = String.valueOf(gameObject.get("whiteUsername").getAsString());
+                    String whiteUsername = gameObject.has("whiteUsername") ? gameObject.get("whiteUsername").getAsString() : null;
+                    String blackUsername = gameObject.has("blackUsername") ? gameObject.get("blackUsername").getAsString() : null;
 
                     var builder = new GsonBuilder();
                     builder.registerTypeAdapter(ChessGame.class, new ChessGameAdapter());
 
                     ChessGame chessGame = builder.create().fromJson(jsonChessGame, ChessGame.class);
 
-                    if (whiteUsername.equals(getUsername())) {
+                    if (whiteUsername != null && whiteUsername.equals(getUsername())) {
                         redrawBoardWhite(chessGame);
-                    } else {
+                    } else if (blackUsername != null && blackUsername.equals(getUsername())){
                         redrawBoardBlack(chessGame);
                     }
                 } else if (serverMessageType == ServerMessage.ServerMessageType.NOTIFICATION) {
                     NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
-                    System.out.println(notificationMessage.getMessage());
+                    System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + notificationMessage.getMessage());
                 } else if (serverMessageType == ServerMessage.ServerMessageType.ERROR) {
                     ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
-                    System.out.println(errorMessage.getErrorMessage());
+                    System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + errorMessage.getErrorMessage());
                 }
             }
         });
@@ -308,6 +310,14 @@ public class Client extends Endpoint {
 
     private void setUsername(String username) {
         this.username = username;
+    }
+
+    public ChessGame.TeamColor getPlayerColor() {
+        return playerColor;
+    }
+
+    private void setPlayerColor(ChessGame.TeamColor playerColor) {
+        this.playerColor = playerColor;
     }
 
     private boolean getInGameStatus() {

@@ -35,14 +35,16 @@ public class WSService {
             return null;
         }
 
+        if (playerColor == ChessGame.TeamColor.WHITE && game.whiteUsername() == null) {
+            return null;
+        } else if(playerColor == ChessGame.TeamColor.BLACK && game.blackUsername() == null) {
+            return null;
+        }
+
         // return null if the teams are empty or if the team names don't match with the username
-        if (game.whiteUsername() != null && game.blackUsername() != null) {
-            if (playerColor == ChessGame.TeamColor.WHITE && !game.whiteUsername().equals(authToken.username())) {
-                return null;
-            } else if (playerColor == ChessGame.TeamColor.BLACK && !game.blackUsername().equals(authToken.username())) {
-                return null;
-            }
-        } else {
+        if (playerColor == ChessGame.TeamColor.WHITE && !game.whiteUsername().equals(authToken.username())) {
+            return null;
+        } else if (playerColor == ChessGame.TeamColor.BLACK && !game.blackUsername().equals(authToken.username())) {
             return null;
         }
 

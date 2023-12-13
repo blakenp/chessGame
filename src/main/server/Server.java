@@ -81,6 +81,7 @@ public class Server {
 
         JsonObject jsonObject = gson.fromJson(message, JsonObject.class);
         UserGameCommand.CommandType commandType = UserGameCommand.CommandType.valueOf(jsonObject.get("commandType").getAsString());
+        System.out.println(commandType);
 
         if (commandType == UserGameCommand.CommandType.JOIN_PLAYER) {
             JoinPlayerCommand joinPlayerCommand = gson.fromJson(message, JoinPlayerCommand.class);
@@ -111,6 +112,7 @@ public class Server {
                 NotificationMessage notificationMessage = new NotificationMessage(username + " has joined the battle", ServerMessage.ServerMessageType.NOTIFICATION);
                 for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
                     if (!loopConnection.authTokenString().equals(joinPlayerCommand.getAuthString())) {
+                        System.out.println("going to send notification");
                         loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
                     }
                 }
