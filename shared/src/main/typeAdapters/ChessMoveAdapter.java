@@ -12,16 +12,14 @@ public class ChessMoveAdapter implements JsonDeserializer<ChessMove> {
     @Override
     public ChessMove deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        JsonObject moveObject = jsonObject.get("move").getAsJsonObject();
+        JsonObject moveObject = jsonObject.getAsJsonObject("move");
         JsonObject jsonStartPosition = moveObject.getAsJsonObject("startPosition");
         JsonObject jsonEndPosition = moveObject.getAsJsonObject("endPosition");
-        JsonObject jsonPromotionPiece = moveObject.has("promotionPiece") ? moveObject.getAsJsonObject("promotionPiece") : null;
+        JsonElement jsonPromotionPieceElement = moveObject.get("promotionPiece");
         ChessPiece.PieceType promotionPiece = null;
 
-        System.out.println("move object: " + moveObject);
-
-        if (jsonPromotionPiece != null) {
-            promotionPiece = ChessPiece.PieceType.valueOf(jsonPromotionPiece.getAsString());
+        if (jsonPromotionPieceElement != null && jsonPromotionPieceElement.isJsonPrimitive()) {
+            promotionPiece = ChessPiece.PieceType.valueOf(jsonPromotionPieceElement.getAsString());
         }
 
         ChessPosition extractedStartPosition = new ChessPositionImpl(jsonStartPosition.getAsJsonPrimitive("row").getAsInt(), jsonStartPosition.getAsJsonPrimitive("col").getAsInt());

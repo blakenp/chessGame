@@ -75,7 +75,7 @@ public class Client extends Endpoint {
                         ChessPosition endPosition = new ChessPositionImpl(Character.getNumericValue(lastTwoChars.charAt(1)), (lastTwoChars.charAt(0) - 'a') + 1);
                         ChessPiece.PieceType promotionPiece = null;
 
-                        if (endPosition.getRow() + 1 == 8 && client.getPlayerColor() == ChessGame.TeamColor.WHITE && client.getChessGame().getBoard().getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN) {
+                        if (endPosition.getRow() == 8 && client.getPlayerColor() == ChessGame.TeamColor.WHITE && client.getChessGame().getBoard().getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA + "Select promotion piece for pawn. Options are " + EscapeSequences.SET_TEXT_COLOR_YELLOW + " QUEEN, BISHOP, ROOK, KNIGHT");
                             String decision = scanner.nextLine();
                             
@@ -90,7 +90,7 @@ public class Client extends Endpoint {
                             } else {
                                 promotionPiece = ChessPiece.PieceType.QUEEN;
                             }
-                        } else if (endPosition.getRow() - 1 == 1 && client.getPlayerColor() == ChessGame.TeamColor.BLACK && client.getChessGame().getBoard().getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN) {
+                        } else if (endPosition.getRow() == 1 && client.getPlayerColor() == ChessGame.TeamColor.BLACK && client.getChessGame().getBoard().getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_MAGENTA + "Select promotion piece for pawn. Options are " + EscapeSequences.SET_TEXT_COLOR_YELLOW + " QUEEN, BISHOP, ROOK, KNIGHT");
                             String decision = scanner.nextLine();
 

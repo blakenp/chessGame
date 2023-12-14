@@ -3,9 +3,7 @@ package server;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import models.Game;
 import services.WSService;
 import spark.Spark;
@@ -163,6 +161,24 @@ public class Server {
             ChessMove chessMove = gson.fromJson(message, ChessMove.class);
 
             JsonObject moveCommandObject = gson.fromJson(message, JsonObject.class);
+            System.out.println("move command object: " + moveCommandObject);
+
+            JsonElement moveElement = moveCommandObject.get("move");
+
+            // logic to make sure any primitive json objects are handled and converted to pure json objects
+            if (moveElement != null && moveElement.isJsonObject()) {
+                JsonObject moveObject = moveElement.getAsJsonObject();
+
+                if (moveObject.has("promotionPiece")) {
+                    moveObject.remove("promotionPiece");
+                }
+            } else if (moveElement != null && moveElement.isJsonPrimitive()) {
+                JsonObject moveObject = new JsonObject();
+
+                moveObject.addProperty("promotionPiece", moveElement.getAsString());
+                moveCommandObject.add("move", moveObject);
+            }
+
             moveCommandObject.remove("move");
             MakeMoveCommand makeMoveCommand = gson.fromJson(moveCommandObject, MakeMoveCommand.class);
 
@@ -205,29 +221,25 @@ public class Server {
                 moveString.append((char)('a' + (endPosition.getColumn() - 1)));
                 moveString.append(endPosition.getRow());
 
+                NotificationMessage notificationMessage = new NotificationMessage(username + " made the move " + moveString, ServerMessage.ServerMessageType.NOTIFICATION);
+                for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
+                    if (!loopConnection.authTokenString().equals(makeMoveCommand.getAuthString())) {
+                        loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
+                        loopConnection.session().getRemote().sendString(gson.toJson(loadGameMessage));
+                    }
+                }
                 if (opponentColor != null && game.chessGame().isInCheckmate(opponentColor)) {
-                    NotificationMessage notificationMessage = new NotificationMessage(opponentUsername + " is in checkmate! GGs", ServerMessage.ServerMessageType.NOTIFICATION);
+                    notificationMessage = new NotificationMessage(opponentUsername + " is in checkmate! GGs", ServerMessage.ServerMessageType.NOTIFICATION);
                     for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
-                        if (!loopConnection.authTokenString().equals(makeMoveCommand.getAuthString())) {
-                            loopConnection.session().getRemote().sendString(gson.toJson(loadGameMessage));
-                        }
                         loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
                     }
                 } else if (opponentColor != null && game.chessGame().isInCheck(opponentColor)) {
-                    NotificationMessage notificationMessage = new NotificationMessage(opponentUsername + " is in check! :O", ServerMessage.ServerMessageType.NOTIFICATION);
+                    notificationMessage = new NotificationMessage(opponentUsername + " is in check! :O", ServerMessage.ServerMessageType.NOTIFICATION);
                     for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
                         if (!loopConnection.authTokenString().equals(makeMoveCommand.getAuthString())) {
                             loopConnection.session().getRemote().sendString(gson.toJson(loadGameMessage));
                         }
                         loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
-                    }
-                } else{
-                    NotificationMessage notificationMessage = new NotificationMessage(username + " made the move " + moveString, ServerMessage.ServerMessageType.NOTIFICATION);
-                    for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
-                        if (!loopConnection.authTokenString().equals(makeMoveCommand.getAuthString())) {
-                            loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
-                            loopConnection.session().getRemote().sendString(gson.toJson(loadGameMessage));
-                        }
                     }
                 }
             } else {
