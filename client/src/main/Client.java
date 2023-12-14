@@ -111,8 +111,6 @@ public class Client extends Endpoint {
                         MakeMoveCommand makeMoveCommand = new MakeMoveCommand(client.getGameID(), move, client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.MAKE_MOVE);
                         String command = gson.toJson(makeMoveCommand);
                         client.send(command);
-                        System.out.println(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
-                        System.out.print("[IN GAME SESSION] >>> ");
                     }
                 } else if (userInput.startsWith("resign")) {
                     System.out.println("Logic for resigning a game goes here");
@@ -239,7 +237,6 @@ public class Client extends Endpoint {
                                 JoinPlayerCommand joinPlayerCommand = new JoinPlayerCommand(gameID, teamColor, UserGameCommand.CommandType.JOIN_PLAYER, client.getAuthToken().authToken());
                                 String command = gson.toJson(joinPlayerCommand);
                                 client.send(command);
-                                System.out.println(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
                             }
                         } catch (NumberFormatException exception) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Game ID must be a number");
@@ -264,7 +261,6 @@ public class Client extends Endpoint {
                             JoinObserverCommand joinObserverCommand = new JoinObserverCommand(gameID, client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.JOIN_OBSERVER);
                             String command = gson.toJson(joinObserverCommand);
                             client.send(command);
-                            System.out.println(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
                         }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -331,13 +327,16 @@ public class Client extends Endpoint {
 
                     if (whiteUsername != null && whiteUsername.equals(getUsername())) {
                         redrawBoardWhite(chessGame);
+                        System.out.print("[IN GAME SESSION] >>> ");
                     } else if (blackUsername != null && blackUsername.equals(getUsername())){
                         redrawBoardBlack(chessGame);
+                        System.out.print("[IN GAME SESSION] >>> ");
                     } else if (whiteUsername != null && blackUsername != null) {
                         // this is for observers who join, so they can see both boards
                         redrawBoardWhite(chessGame);
-                        System.out.println("\n" + EscapeSequences.RESET_BG_COLOR + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
+                        System.out.println("\n");
                         redrawBoardBlack(chessGame);
+                        System.out.print("[IN GAME SESSION] >>> ");
                     }
                 } else if (serverMessageType == ServerMessage.ServerMessageType.NOTIFICATION) {
                     NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
@@ -508,6 +507,7 @@ public class Client extends Endpoint {
 
         boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
         System.out.println(boardString);
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
     }
 
     private void redrawBoardWhite(ChessGame game) {
@@ -570,6 +570,7 @@ public class Client extends Endpoint {
 
         boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
         System.out.println(boardString);
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
     }
 
     @Override
