@@ -113,9 +113,13 @@ public class Client extends Endpoint {
                         client.send(command);
                     }
                 } else if (userInput.startsWith("resign")) {
-                    System.out.println("Logic for resigning a game goes here");
+                    ResignCommand resignCommand = new ResignCommand(client.getGameID(), client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.RESIGN);
+                    String command = gson.toJson(resignCommand);
+                    client.send(command);
                 } else if (userInput.startsWith("leave")) {
-                    System.out.println("Logic for leaving a game goes here");
+                    LeaveCommand leaveCommand = new LeaveCommand(client.getGameID(), client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.LEAVE);
+                    String command = gson.toJson(leaveCommand);
+                    client.send(command);
                     client.setInGameStatus(false);
                 } else if (userInput.startsWith("help")) {
                     client.displayHelpMenuInGame();
@@ -341,9 +345,11 @@ public class Client extends Endpoint {
                 } else if (serverMessageType == ServerMessage.ServerMessageType.NOTIFICATION) {
                     NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + notificationMessage.getMessage() + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
+                    System.out.print("[IN GAME SESSION] >>> ");
                 } else if (serverMessageType == ServerMessage.ServerMessageType.ERROR) {
                     ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + errorMessage.getErrorMessage() + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
+                    System.out.print("[IN GAME SESSION] >>> ");
                 }
             }
         });
