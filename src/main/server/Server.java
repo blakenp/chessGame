@@ -182,17 +182,52 @@ public class Server {
                 gameConnections.add(connection);
 
                 String username = makeMoveCommand.getUsername();
+                String opponentUsername = "";
+                ChessGame.TeamColor opponentColor = null;
+
+                if (username != null && username.equals(game.whiteUsername())) {
+                    opponentColor = ChessGame.TeamColor.BLACK;
+                    opponentUsername = game.blackUsername();
+                } else if (username != null && username.equals(game.blackUsername())) {
+                    opponentColor = ChessGame.TeamColor.WHITE;
+                    opponentUsername = game.whiteUsername();
+                }
 
                 LoadGameMessage loadGameMessage = new LoadGameMessage(game, ServerMessage.ServerMessageType.LOAD_GAME);
                 response = gson.toJson(loadGameMessage);
 
                 ChessPosition startPosition = makeMoveCommand.getChessMove().getStartPosition();
                 ChessPosition endPosition = makeMoveCommand.getChessMove().getEndPosition();
-                NotificationMessage notificationMessage = new NotificationMessage(username + " made the move (" + startPosition + ", " + endPosition + ")", ServerMessage.ServerMessageType.NOTIFICATION);
-                for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
-                    if (!loopConnection.authTokenString().equals(makeMoveCommand.getAuthString())) {
+
+                StringBuilder moveString = new StringBuilder();
+                moveString.append((char)('a' + (startPosition.getColumn() - 1)));
+                moveString.append(startPosition.getRow());
+                moveString.append((char)('a' + (endPosition.getColumn() - 1)));
+                moveString.append(endPosition.getRow());
+
+                if (opponentColor != null && game.chessGame().isInCheckmate(opponentColor)) {
+                    NotificationMessage notificationMessage = new NotificationMessage(opponentUsername + " is in checkmate! GGs", ServerMessage.ServerMessageType.NOTIFICATION);
+                    for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
+                        if (!loopConnection.authTokenString().equals(makeMoveCommand.getAuthString())) {
+                            loopConnection.session().getRemote().sendString(gson.toJson(loadGameMessage));
+                        }
                         loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
-                        loopConnection.session().getRemote().sendString(gson.toJson(loadGameMessage));
+                    }
+                } else if (opponentColor != null && game.chessGame().isInCheck(opponentColor)) {
+                    NotificationMessage notificationMessage = new NotificationMessage(opponentUsername + " is in check! :O", ServerMessage.ServerMessageType.NOTIFICATION);
+                    for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
+                        if (!loopConnection.authTokenString().equals(makeMoveCommand.getAuthString())) {
+                            loopConnection.session().getRemote().sendString(gson.toJson(loadGameMessage));
+                        }
+                        loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
+                    }
+                } else{
+                    NotificationMessage notificationMessage = new NotificationMessage(username + " made the move " + moveString, ServerMessage.ServerMessageType.NOTIFICATION);
+                    for (Connection loopConnection : connectionsToGames.get(game.gameID())) {
+                        if (!loopConnection.authTokenString().equals(makeMoveCommand.getAuthString())) {
+                            loopConnection.session().getRemote().sendString(gson.toJson(notificationMessage));
+                            loopConnection.session().getRemote().sendString(gson.toJson(loadGameMessage));
+                        }
                     }
                 }
             } else {

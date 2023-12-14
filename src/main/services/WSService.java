@@ -105,10 +105,14 @@ public class WSService {
             return null;
         }
 
+        ChessGame.TeamColor opponentColor = null;
+
         if (authToken.username().equals(game.whiteUsername())) {
             playerColor = ChessGame.TeamColor.WHITE;
+            opponentColor = ChessGame.TeamColor.BLACK;
         } else if (authToken.username().equals(game.blackUsername())) {
             playerColor = ChessGame.TeamColor.BLACK;
+            opponentColor = ChessGame.TeamColor.WHITE;
         } else {
             return null;
         }
@@ -123,6 +127,11 @@ public class WSService {
             game.chessGame().makeMove(makeMoveCommand.getChessMove());
         } catch (InvalidMoveException invalidMoveException) {
             return null;
+        }
+
+        // Set game state to finished if your move put the opponent in checkmate
+        if (game.chessGame().isInCheckmate(opponentColor)) {
+            game.setFinished(true);
         }
 
         // update the game in the database

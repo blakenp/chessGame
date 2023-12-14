@@ -71,8 +71,6 @@ public class Client extends Endpoint {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid Move. Column indices only range from a-h" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                         }
 
-                        System.out.println("col for start - 1: " + (firstTwoChars.charAt(0) - 'a'));
-                        System.out.println("col for end - 1: " + (lastTwoChars.charAt(0) - 'a'));
                         ChessPosition startPosition = new ChessPositionImpl(Character.getNumericValue(firstTwoChars.charAt(1)), (firstTwoChars.charAt(0) - 'a') + 1);
                         ChessPosition endPosition = new ChessPositionImpl(Character.getNumericValue(lastTwoChars.charAt(1)), (lastTwoChars.charAt(0) - 'a') + 1);
                         ChessPiece.PieceType promotionPiece = null;
@@ -112,8 +110,9 @@ public class Client extends Endpoint {
                         ChessMove move = new ChessMoveImpl(startPosition, endPosition, promotionPiece);
                         MakeMoveCommand makeMoveCommand = new MakeMoveCommand(client.getGameID(), move, client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.MAKE_MOVE);
                         String command = gson.toJson(makeMoveCommand);
-                        System.out.println("command json: " + command);
                         client.send(command);
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
+                        System.out.print("[IN GAME SESSION] >>> ");
                     }
                 } else if (userInput.startsWith("resign")) {
                     System.out.println("Logic for resigning a game goes here");
@@ -240,6 +239,7 @@ public class Client extends Endpoint {
                                 JoinPlayerCommand joinPlayerCommand = new JoinPlayerCommand(gameID, teamColor, UserGameCommand.CommandType.JOIN_PLAYER, client.getAuthToken().authToken());
                                 String command = gson.toJson(joinPlayerCommand);
                                 client.send(command);
+                                System.out.println(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
                             }
                         } catch (NumberFormatException exception) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Game ID must be a number");
@@ -264,6 +264,7 @@ public class Client extends Endpoint {
                             JoinObserverCommand joinObserverCommand = new JoinObserverCommand(gameID, client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.JOIN_OBSERVER);
                             String command = gson.toJson(joinObserverCommand);
                             client.send(command);
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
                         }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -341,11 +342,9 @@ public class Client extends Endpoint {
                 } else if (serverMessageType == ServerMessage.ServerMessageType.NOTIFICATION) {
                     NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + notificationMessage.getMessage() + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
-                    System.out.println("\n");
                 } else if (serverMessageType == ServerMessage.ServerMessageType.ERROR) {
                     ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + errorMessage.getErrorMessage() + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
-                    System.out.println("\n");
                 }
             }
         });
