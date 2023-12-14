@@ -37,7 +37,7 @@ public class GameService {
         Random random = new Random();
         int randomGameID = random.nextInt(1000);
 
-        Game newGame = new Game(randomGameID, null, null, request.gameName(), new ChessGameImpl());
+        Game newGame = new Game(randomGameID, null, null, request.gameName(), new ChessGameImpl(), false);
 
         try {
             // if the client didn't send a game name in the request, throw an error
@@ -78,7 +78,7 @@ public class GameService {
 
             User user = new User(authToken.username(), null, null);
             user = userDAO.get(user);
-            Game storedGame = new Game(request.gameID(), null, null, null, new ChessGameImpl());
+            Game storedGame = new Game(request.gameID(), null, null, null, new ChessGameImpl(), false);
 
             try {
                 storedGame = gameDAO.get(storedGame);
@@ -95,10 +95,10 @@ public class GameService {
 
             // join as white or black team player if those options are still not taken. Else, throw an error
             if (request.playerColor() == ChessGame.TeamColor.WHITE && storedGame.whiteUsername() == null) {
-                updatedGame = new Game(storedGame.gameID(), user.username(), storedGame.blackUsername(), storedGame.gameName(), storedGame.game());
+                updatedGame = new Game(storedGame.gameID(), user.username(), storedGame.blackUsername(), storedGame.gameName(), storedGame.chessGame(), storedGame.isFinished());
             }
             else if (request.playerColor() == ChessGame.TeamColor.BLACK && storedGame.blackUsername() == null) {
-                updatedGame = new Game(storedGame.gameID(), storedGame.whiteUsername(), user.username(), storedGame.gameName(), storedGame.game());
+                updatedGame = new Game(storedGame.gameID(), storedGame.whiteUsername(), user.username(), storedGame.gameName(), storedGame.chessGame(), storedGame.isFinished());
             } else {
                 return new JoinGameResponse("Error: already taken");
             }

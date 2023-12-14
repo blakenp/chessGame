@@ -4,6 +4,7 @@
     <root id="archive" name="client.jar">
       <element id="module-output" name="client" />
       <element id="module-output" name="shared" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/tyrus-standalone-client-1.15.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/gson-2.10.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/slf4j-simple-1.7.36.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/slf4j-api-1.7.36.jar" path-in-jar="/" />
