@@ -17,8 +17,7 @@ import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 import javax.websocket.*;
 import java.net.URI;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Client extends Endpoint {
     private boolean isLoggedIn = false;
@@ -43,16 +42,40 @@ public class Client extends Endpoint {
 
                 if (userInput.startsWith("redraw")) {
                     if (client.getPlayerColor() == ChessGame.TeamColor.WHITE) {
-                        client.redrawBoardWhite(client.getChessGame());
+                        String board = client.redrawBoard(client.getChessGame(), ChessGame.TeamColor.WHITE);
+                        System.out.println(board);
                     } else if (client.getPlayerColor() == ChessGame.TeamColor.BLACK) {
-                        client.redrawBoardBlack(client.getChessGame());
+                        String board = client.redrawBoard(client.getChessGame(), ChessGame.TeamColor.BLACK);
+                        System.out.println(board);
                     } else {
-                        client.redrawBoardWhite(client.getChessGame());
+                        String whiteBoard = client.redrawBoard(client.getChessGame(), ChessGame.TeamColor.WHITE);
+                        System.out.println(whiteBoard);
                         System.out.println("\n");
-                        client.redrawBoardBlack(client.getChessGame());
+                        String blackBoard = client.redrawBoard(client.getChessGame(), ChessGame.TeamColor.BLACK);
+                        System.out.println(blackBoard);
                     }
                 } else if (userInput.startsWith("highlight")) {
-                    System.out.println("Logic for highlighting valid moves goes here");
+                    String[] commandArgs = userInput.split(" ");
+                    if (commandArgs.length == 2) {
+                        String positionString = commandArgs[1];
+                        int stringLength = positionString.length();
+
+                        if (stringLength != 2) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid Position. Position syntax needs to have 1 col and 1 row specified (ie e2)" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                            continue;
+                        }
+
+                        String firstTwoChars = positionString.substring(0, 2);
+
+                        if ((firstTwoChars.charAt(0) > 'h' && firstTwoChars.charAt(0) <= 'z')) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid Position. Column indices only range from a-h" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                            continue;
+                        }
+
+                        ChessPosition startPosition = new ChessPositionImpl(Character.getNumericValue(firstTwoChars.charAt(1)), (firstTwoChars.charAt(0) - 'a') + 1);
+                        String board = client.highlightLegalMoves(client.getChessGame(), startPosition, client.getPlayerColor());
+                        System.out.println(board);
+                    }
                 } else if (userInput.startsWith("move")) {
                     String[] commandArgs = userInput.split(" ");
                     if (commandArgs.length == 2) {
@@ -69,6 +92,7 @@ public class Client extends Endpoint {
 
                         if ((firstTwoChars.charAt(0) > 'h' && firstTwoChars.charAt(0) <= 'z') && (lastTwoChars.charAt(0) > 'h' && lastTwoChars.charAt(0) <= 'z')) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid Move. Column indices only range from a-h" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
+                            continue;
                         }
 
                         ChessPosition startPosition = new ChessPositionImpl(Character.getNumericValue(firstTwoChars.charAt(1)), (firstTwoChars.charAt(0) - 'a') + 1);
@@ -330,17 +354,21 @@ public class Client extends Endpoint {
                     setChessGame(chessGame);
 
                     if (whiteUsername != null && whiteUsername.equals(getUsername())) {
-                        redrawBoardWhite(chessGame);
-                        System.out.print("[IN GAME SESSION] >>> ");
+                        String board = redrawBoard(chessGame, ChessGame.TeamColor.WHITE);
+                        System.out.println(board);
+                        System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + "[IN GAME SESSION] >>> ");
                     } else if (blackUsername != null && blackUsername.equals(getUsername())){
-                        redrawBoardBlack(chessGame);
-                        System.out.print("[IN GAME SESSION] >>> ");
+                        String board = redrawBoard(chessGame, ChessGame.TeamColor.BLACK);
+                        System.out.println(board);
+                        System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + "[IN GAME SESSION] >>> ");
                     } else if (whiteUsername != null && blackUsername != null) {
                         // this is for observers who join, so they can see both boards
-                        redrawBoardWhite(chessGame);
+                        String whiteBoard = redrawBoard(chessGame, ChessGame.TeamColor.WHITE);
+                        System.out.println(whiteBoard);
                         System.out.println("\n");
-                        redrawBoardBlack(chessGame);
-                        System.out.print("[IN GAME SESSION] >>> ");
+                        String blackBoard = redrawBoard(chessGame, ChessGame.TeamColor.BLACK);
+                        System.out.println(blackBoard);
+                        System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + "[IN GAME SESSION] >>> ");
                     }
                 } else if (serverMessageType == ServerMessage.ServerMessageType.NOTIFICATION) {
                     NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
@@ -442,7 +470,7 @@ public class Client extends Endpoint {
 
     private void displayHelpMenuInGame() {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  redraw" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to print out the chess board again");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  highlight" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to highlight your team's legal moves");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  highlight <START POSITION>" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to highlight your team's legal moves");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  move <MOVE>" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to move one of your pieces to another space");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  resign" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to resign/forfeit the game");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  leave" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to leave the game session");
@@ -453,7 +481,70 @@ public class Client extends Endpoint {
         return "Game ID: " + game.gameID() + ", White Team Player: " + game.whiteUsername() + ", Black Team Player: " + game.blackUsername() + ", Game Name: " + game.gameName();
     }
 
-    private void redrawBoardBlack(ChessGame game) {
+    private String redrawBoard(ChessGame game, ChessGame.TeamColor teamColor) {
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            ChessBoard chessBoard = game.getBoard();
+            StringBuilder boardString = new StringBuilder();
+
+            boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+            boardString.append("\n");
+            for (var i = 8; i >= 1; i--) {
+                boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
+                for (var j = 1; j <= 8; j++) {
+                    ChessPosition chessPosition = new ChessPositionImpl(i, j);
+                    ChessPiece chessPiece = chessBoard.getPiece(chessPosition);
+
+                    if (i % 2 != 0) {
+                        if (j % 2 != 0) {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                        } else {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                        }
+                    } else {
+                        if (j % 2 != 0) {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                        } else {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                        }
+                    }
+
+                    if (chessPiece == null) {
+                        boardString.append(EscapeSequences.EMPTY);
+                    } else {
+                        if (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                            boardString.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
+                            switch (chessPiece.getPieceType()) {
+                                case ROOK -> boardString.append(EscapeSequences.WHITE_ROOK);
+                                case KNIGHT -> boardString.append(EscapeSequences.WHITE_KNIGHT);
+                                case BISHOP -> boardString.append(EscapeSequences.WHITE_BISHOP);
+                                case KING -> boardString.append(EscapeSequences.WHITE_KING);
+                                case QUEEN -> boardString.append(EscapeSequences.WHITE_QUEEN);
+                                default -> boardString.append(EscapeSequences.WHITE_PAWN);
+                            }
+                        } else {
+                            boardString.append(EscapeSequences.SET_TEXT_COLOR_RED);
+                            switch (chessPiece.getPieceType()) {
+                                case ROOK -> boardString.append(EscapeSequences.BLACK_ROOK);
+                                case KNIGHT -> boardString.append(EscapeSequences.BLACK_KNIGHT);
+                                case BISHOP -> boardString.append(EscapeSequences.BLACK_BISHOP);
+                                case KING -> boardString.append(EscapeSequences.BLACK_KING);
+                                case QUEEN -> boardString.append(EscapeSequences.BLACK_QUEEN);
+                                default -> boardString.append(EscapeSequences.WHITE_PAWN);
+                            }
+                        }
+                    }
+
+                    boardString.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+                }
+                boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
+                boardString.append("\n");
+            }
+
+            boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+            return boardString.toString();
+        }
+
+        // print out black board if team color wasn't white
         ChessBoard chessBoard = game.getBoard();
         StringBuilder boardString = new StringBuilder();
 
@@ -512,33 +603,147 @@ public class Client extends Endpoint {
         }
 
         boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
-        System.out.println(boardString);
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
+        return boardString.toString();
     }
 
-    private void redrawBoardWhite(ChessGame game) {
-        ChessBoard chessBoard = game.getBoard();
+    private String highlightLegalMoves(ChessGame game, ChessPosition startPosition, ChessGame.TeamColor teamColor) {
         StringBuilder boardString = new StringBuilder();
+        ChessBoard chessBoard = game.getBoard();
 
-        boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+        Collection<ChessMove> validMoves = game.validMoves(startPosition);
+        Set<ChessPosition> endPositions = new HashSet<>();
+
+        for (ChessMove move : validMoves) {
+            endPositions.add(move.getEndPosition());
+        }
+
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+            boardString.append("\n");
+            for (var i = 8; i >= 1; i--) {
+                boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
+                for (var j = 1; j <= 8; j++) {
+                    ChessPosition chessPosition = new ChessPositionImpl(i, j);
+                    ChessPiece chessPiece = chessBoard.getPiece(chessPosition);
+
+                    if (i % 2 != 0) {
+                        if (j % 2 != 0) {
+                            if (endPositions != null && chessPosition.equals(startPosition)) {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_YELLOW);
+                            } else if (endPositions != null && endPositions.contains(chessPosition)) {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_GREEN);
+                            } else {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                            }
+                        } else {
+                            if (endPositions != null && chessPosition.equals(startPosition)) {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_YELLOW);
+                            } else if (endPositions != null && endPositions.contains(chessPosition)) {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                            } else {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                            }
+                        }
+                    } else {
+                        if (j % 2 != 0) {
+                            if (endPositions != null && chessPosition.equals(startPosition)) {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_YELLOW);
+                            } else if (endPositions != null && endPositions.contains(chessPosition)) {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                            } else {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                            }
+                        } else {
+                            if (endPositions != null && chessPosition.equals(startPosition)) {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_YELLOW);
+                            } else if (endPositions != null && endPositions.contains(chessPosition)) {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_GREEN);
+                            } else {
+                                boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                            }
+                        }
+                    }
+
+                    if (chessPiece == null) {
+                        boardString.append(EscapeSequences.EMPTY);
+                    } else {
+                        if (chessPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                            boardString.append(EscapeSequences.SET_TEXT_COLOR_BLUE);
+                            switch (chessPiece.getPieceType()) {
+                                case ROOK -> boardString.append(EscapeSequences.WHITE_ROOK);
+                                case KNIGHT -> boardString.append(EscapeSequences.WHITE_KNIGHT);
+                                case BISHOP -> boardString.append(EscapeSequences.WHITE_BISHOP);
+                                case KING -> boardString.append(EscapeSequences.WHITE_KING);
+                                case QUEEN -> boardString.append(EscapeSequences.WHITE_QUEEN);
+                                default -> boardString.append(EscapeSequences.WHITE_PAWN);
+                            }
+                        } else {
+                            boardString.append(EscapeSequences.SET_TEXT_COLOR_RED);
+                            switch (chessPiece.getPieceType()) {
+                                case ROOK -> boardString.append(EscapeSequences.BLACK_ROOK);
+                                case KNIGHT -> boardString.append(EscapeSequences.BLACK_KNIGHT);
+                                case BISHOP -> boardString.append(EscapeSequences.BLACK_BISHOP);
+                                case KING -> boardString.append(EscapeSequences.BLACK_KING);
+                                case QUEEN -> boardString.append(EscapeSequences.BLACK_QUEEN);
+                                default -> boardString.append(EscapeSequences.WHITE_PAWN);
+                            }
+                        }
+                    }
+
+                    boardString.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+                }
+                boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
+                boardString.append("\n");
+            }
+
+            boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+            return boardString.toString();
+        }
+
+        // print out black board if team color wasn't white
+        boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
         boardString.append("\n");
-        for (var i = 8; i >= 1; i--) {
+        for (var i = 1; i <= 8; i++) {
             boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
-            for (var j = 1; j <= 8; j++) {
+            for (var j = 8; j >= 1; j--) {
                 ChessPosition chessPosition = new ChessPositionImpl(i, j);
                 ChessPiece chessPiece = chessBoard.getPiece(chessPosition);
 
                 if (i % 2 != 0) {
                     if (j % 2 != 0) {
-                        boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                        if (endPositions != null && chessPosition.equals(startPosition)) {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_YELLOW);
+                        } else if (endPositions != null && endPositions.contains(chessPosition)) {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_GREEN);
+                        } else {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                        }
                     } else {
-                        boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                        if (endPositions != null && chessPosition.equals(startPosition)) {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_YELLOW);
+                        } else if (endPositions != null && endPositions.contains(chessPosition)) {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                        } else {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                        }
                     }
                 } else {
                     if (j % 2 != 0) {
-                        boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                        if (endPositions != null && chessPosition.equals(startPosition)) {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_YELLOW);
+                        } else if (endPositions != null && endPositions.contains(chessPosition)) {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                        } else {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                        }
                     } else {
-                        boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                        if (endPositions != null && chessPosition.equals(startPosition)) {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_YELLOW);
+                        } else if (endPositions != null && endPositions.contains(chessPosition)) {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_GREEN);
+                        } else {
+                            boardString.append(EscapeSequences.SET_BG_COLOR_WHITE);
+                        }
                     }
                 }
 
@@ -574,9 +779,8 @@ public class Client extends Endpoint {
             boardString.append("\n");
         }
 
-        boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " a  b  c  d  e  f  g  h " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
-        System.out.println(boardString);
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
+        boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.EMPTY + " h  g  f  e  d  c  b  a " + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+        return boardString.toString();
     }
 
     @Override
