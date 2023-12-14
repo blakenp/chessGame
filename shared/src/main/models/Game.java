@@ -9,9 +9,10 @@ import chess.ChessGame;
  * @param whiteUsername Data field representing a game's white team player's username
  * @param blackUsername Data field representing a game's black team player's username
  * @param gameName      Data field representing a game's name
- * @param game          Data field representing the chess game of the Game object
+ * @param chessGame          Data field representing the chess game of the Game object
+ * @param isFinished    Data field representing a game's state
  */
-public record Game(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
+public record Game(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame chessGame, boolean isFinished) {
     /**
      * Game object constructor that will have a game ID and the usernames of the players playing, the name of the game,
      * and the object representing the chess game with its board itself
@@ -20,7 +21,7 @@ public record Game(int gameID, String whiteUsername, String blackUsername, Strin
      * @param whiteUsername The game's white team player's username
      * @param blackUsername The game's black team player's username
      * @param gameName The game's name
-     * @param game The game's game object
+     * @param chessGame The game's game object
      */
     public Game {
     }
@@ -71,7 +72,19 @@ public record Game(int gameID, String whiteUsername, String blackUsername, Strin
      * @return The game's chess game object
      */
     @Override
-    public ChessGame game() {
-        return game;
+    public ChessGame chessGame() {
+        return chessGame;
+    }
+
+    public Game setFinished(boolean isFinished) {
+        return new Game(gameID, whiteUsername, blackUsername, gameName, chessGame, isFinished);
+    }
+
+    public Game removeWhite() {
+        return new Game(gameID, null, blackUsername, gameName, chessGame, isFinished);
+    }
+
+    public Game removeBlack() {
+        return new Game(gameID, whiteUsername, null, gameName, chessGame, isFinished);
     }
 }

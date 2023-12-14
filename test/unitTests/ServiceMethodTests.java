@@ -133,7 +133,7 @@ public class ServiceMethodTests {
         AuthToken testAuthToken = new AuthToken("Mario", "123j4-ladf[ol-adjf");
         authDAO.post(testAuthToken);
 
-        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl());
+        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl(), false);
         gameDAO.post(game);
 
         CreateGameRequest createGameRequest = new CreateGameRequest("mushroom kingdom", "123j4-ladf[ol-adjf");
@@ -151,10 +151,10 @@ public class ServiceMethodTests {
         User testUser = new User("Mario", "Luigi", "mario@gmail.com");
         userDAO.post(testUser);
 
-        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl());
+        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl(), false);
         gameDAO.post(game);
 
-        Game updatedGame = new Game(123, "Mario", null, "mushroom kingdom", new ChessGameImpl());
+        Game updatedGame = new Game(123, "Mario", null, "mushroom kingdom", new ChessGameImpl(), false);
 
         JoinGameRequest joinGameRequest = new JoinGameRequest(ChessGame.TeamColor.WHITE,123, testAuthToken.authToken());
         gameService.joinGame(joinGameRequest);
@@ -170,7 +170,7 @@ public class ServiceMethodTests {
         User testUser = new User("Mario", "Luigi", "mario@gmail.com");
         userDAO.post(testUser);
 
-        Game game = new Game(123, "Luigi", null, "mushroom kingdom", new ChessGameImpl());
+        Game game = new Game(123, "Luigi", null, "mushroom kingdom", new ChessGameImpl(), false);
         gameDAO.post(game);
 
         JoinGameRequest joinGameRequest = new JoinGameRequest(ChessGame.TeamColor.WHITE,123, testAuthToken.authToken());
@@ -184,8 +184,8 @@ public class ServiceMethodTests {
         AuthToken testAuthToken = new AuthToken("Mario", "123j4-ladf[ol-adjf");
         authDAO.post(testAuthToken);
 
-        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl());
-        Game game2 = new Game(12345, null, null, "candy land", new ChessGameImpl());
+        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl(), false);
+        Game game2 = new Game(12345, null, null, "candy land", new ChessGameImpl(), false);
         gameDAO.post(game);
         gameDAO.post(game2);
 
@@ -202,8 +202,8 @@ public class ServiceMethodTests {
         AuthToken testAuthToken = new AuthToken("Mario", "123j4-ladf[ol-adjf");
         authDAO.post(testAuthToken);
 
-        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl());
-        Game game2 = new Game(12345, null, null, "candy land", new ChessGameImpl());
+        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl(), false);
+        Game game2 = new Game(12345, null, null, "candy land", new ChessGameImpl(), false);
         gameDAO.post(game);
         gameDAO.post(game2);
 
@@ -218,8 +218,8 @@ public class ServiceMethodTests {
         AuthToken testAuthToken = new AuthToken("Mario", "123j4-ladf[ol-adjf");
         authDAO.post(testAuthToken);
 
-        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl());
-        Game game2 = new Game(12345, null, null, "candy land", new ChessGameImpl());
+        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl(), false);
+        Game game2 = new Game(12345, null, null, "candy land", new ChessGameImpl(), false);
         gameDAO.post(game);
         gameDAO.post(game2);
 
@@ -240,8 +240,8 @@ public class ServiceMethodTests {
         AuthToken testAuthToken = new AuthToken("Mario", "123j4-ladf[ol-adjf");
         authDAO.post(testAuthToken);
 
-        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl());
-        Game game2 = new Game(12345, null, null, "candy land", new ChessGameImpl());
+        Game game = new Game(123, null, null, "mushroom kingdom", new ChessGameImpl(), false);
+        Game game2 = new Game(12345, null, null, "candy land", new ChessGameImpl(), false);
         gameDAO.post(game);
         gameDAO.post(game2);
 
