@@ -82,6 +82,10 @@ public class ChessGameImpl implements ChessGame {
         ChessPiece chessPiece = board.getPiece(startPosition);
         ChessPiece promotionPiece = null;
 
+        if (chessPiece == null) {
+            throw new InvalidMoveException("Invalid move cuz piece in starting position is null");
+        }
+
         // check if it's the turn of the player making the move first
         if (chessPiece.getTeamColor() != getTeamTurn()) {
             throw new InvalidMoveException("It's not this player's turn to move yet!");

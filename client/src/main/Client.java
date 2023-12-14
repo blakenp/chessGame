@@ -1,5 +1,4 @@
 import chess.*;
-import chessImplementation.ChessGameImpl;
 import chessImplementation.ChessMoveImpl;
 import chessImplementation.ChessPositionImpl;
 import com.google.gson.GsonBuilder;
@@ -25,7 +24,6 @@ public class Client extends Endpoint {
     private boolean isLoggedIn = false;
     private boolean isStillUsing = true;
     private boolean isInGame = false;
-    private boolean isObserver = false;
     private AuthToken authToken;
     private String username;
     private ChessGame.TeamColor playerColor;
@@ -58,23 +56,25 @@ public class Client extends Endpoint {
                 } else if (userInput.startsWith("move")) {
                     String[] commandArgs = userInput.split(" ");
                     if (commandArgs.length == 2) {
-                        String move = commandArgs[1];
-                        int stringLength = move.length();
+                        String moveString = commandArgs[1];
+                        int stringLength = moveString.length();
 
                         if (stringLength != 4) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid Move. Move syntax needs to have 2 cols and 2 rows specified (ie e2e4)" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                             continue;
                         }
 
-                        String firstTwoChars = move.substring(0, 2);
-                        String lastTwoChars = move.substring(move.length() - 2);
+                        String firstTwoChars = moveString.substring(0, 2);
+                        String lastTwoChars = moveString.substring(moveString.length() - 2);
 
                         if ((firstTwoChars.charAt(0) > 'h' && firstTwoChars.charAt(0) <= 'z') && (lastTwoChars.charAt(0) > 'h' && lastTwoChars.charAt(0) <= 'z')) {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid Move. Column indices only range from a-h" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                         }
 
-                        ChessPosition startPosition = new ChessPositionImpl((firstTwoChars.charAt(0) - 'a') + 1, Character.getNumericValue(firstTwoChars.charAt(1)));
-                        ChessPosition endPosition = new ChessPositionImpl((lastTwoChars.charAt(0) - 'a') + 1, Character.getNumericValue(lastTwoChars.charAt(1)));
+                        System.out.println("col for start - 1: " + (firstTwoChars.charAt(0) - 'a'));
+                        System.out.println("col for end - 1: " + (lastTwoChars.charAt(0) - 'a'));
+                        ChessPosition startPosition = new ChessPositionImpl(Character.getNumericValue(firstTwoChars.charAt(1)), (firstTwoChars.charAt(0) - 'a') + 1);
+                        ChessPosition endPosition = new ChessPositionImpl(Character.getNumericValue(lastTwoChars.charAt(1)), (lastTwoChars.charAt(0) - 'a') + 1);
                         ChessPiece.PieceType promotionPiece = null;
 
                         if (endPosition.getRow() + 1 == 8 && client.getPlayerColor() == ChessGame.TeamColor.WHITE && client.getChessGame().getBoard().getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN) {
@@ -109,9 +109,10 @@ public class Client extends Endpoint {
                             }
                         }
 
-                        ChessMove chessMove = new ChessMoveImpl(startPosition, endPosition, promotionPiece);
-                        MakeMoveCommand makeMoveCommand = new MakeMoveCommand(client.getGameID(), chessMove, client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.MAKE_MOVE);
+                        ChessMove move = new ChessMoveImpl(startPosition, endPosition, promotionPiece);
+                        MakeMoveCommand makeMoveCommand = new MakeMoveCommand(client.getGameID(), move, client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.MAKE_MOVE);
                         String command = gson.toJson(makeMoveCommand);
+                        System.out.println("command json: " + command);
                         client.send(command);
                     }
                 } else if (userInput.startsWith("resign")) {
@@ -226,6 +227,7 @@ public class Client extends Endpoint {
                                 teamColor = ChessGame.TeamColor.BLACK;
                             }
 
+                            client.setGameID(gameID);
                             client.setPlayerColor(teamColor);
                             JoinGameRequest joinGameRequest = new JoinGameRequest(teamColor, gameID, client.getAuthToken().authToken());
                             JoinGameResponse joinGameResponse = ServerFacade.handleClientJoinGame(joinGameRequest);
@@ -257,11 +259,11 @@ public class Client extends Endpoint {
                         } else {
                             System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Successfully joined as observer" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
                             client.setInGameStatus(true);
+                            client.setGameID(gameID);
 
                             JoinObserverCommand joinObserverCommand = new JoinObserverCommand(gameID, client.getUsername(), client.getAuthToken().authToken(), UserGameCommand.CommandType.JOIN_OBSERVER);
                             String command = gson.toJson(joinObserverCommand);
                             client.send(command);
-                            client.setObserver(true);
                         }
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid input. Type help + Enter to see possible commands" + EscapeSequences.SET_TEXT_COLOR_MAGENTA);
@@ -333,15 +335,17 @@ public class Client extends Endpoint {
                     } else if (whiteUsername != null && blackUsername != null) {
                         // this is for observers who join, so they can see both boards
                         redrawBoardWhite(chessGame);
-                        System.out.println("\n" + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR);
+                        System.out.println("\n" + EscapeSequences.RESET_BG_COLOR + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
                         redrawBoardBlack(chessGame);
                     }
                 } else if (serverMessageType == ServerMessage.ServerMessageType.NOTIFICATION) {
                     NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
-                    System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + notificationMessage.getMessage());
+                    System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + notificationMessage.getMessage() + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
+                    System.out.println("\n");
                 } else if (serverMessageType == ServerMessage.ServerMessageType.ERROR) {
                     ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
-                    System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + errorMessage.getErrorMessage());
+                    System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + errorMessage.getErrorMessage() + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY);
+                    System.out.println("\n");
                 }
             }
         });
@@ -365,14 +369,6 @@ public class Client extends Endpoint {
 
     private void setLoggedInStatus(boolean status) {
         this.isLoggedIn = status;
-    }
-
-    private boolean getObserverStatus() {
-        return isObserver;
-    }
-
-    private void setObserver(boolean status) {
-        this.isObserver = status;
     }
 
     private AuthToken getAuthToken() {
@@ -443,7 +439,7 @@ public class Client extends Endpoint {
     private void displayHelpMenuInGame() {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  redraw" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to print out the chess board again");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  highlight" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to highlight your team's legal moves");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  move" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to move one of your pieces to another space");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  move <MOVE>" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to move one of your pieces to another space");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  resign" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to resign/forfeit the game");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  leave" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to leave the game session");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "  help" + EscapeSequences.SET_TEXT_COLOR_MAGENTA + " - to display all possible commands");
@@ -461,7 +457,7 @@ public class Client extends Endpoint {
         boardString.append("\n");
         for (var i = 1; i <= 8; i++) {
             boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
-            for (var j = 1; j <= 8; j++) {
+            for (var j = 8; j >= 1; j--) {
                 ChessPosition chessPosition = new ChessPositionImpl(i, j);
                 ChessPiece chessPiece = chessBoard.getPiece(chessPosition);
 
@@ -523,7 +519,7 @@ public class Client extends Endpoint {
         boardString.append("\n");
         for (var i = 8; i >= 1; i--) {
             boardString.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " " + i + " " + EscapeSequences.RESET_BG_COLOR);
-            for (var j = 8; j >= 1; j--) {
+            for (var j = 1; j <= 8; j++) {
                 ChessPosition chessPosition = new ChessPositionImpl(i, j);
                 ChessPiece chessPiece = chessBoard.getPiece(chessPosition);
 

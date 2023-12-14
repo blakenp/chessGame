@@ -12,13 +12,12 @@ public class ChessMoveAdapter implements JsonDeserializer<ChessMove> {
     @Override
     public ChessMove deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        JsonObject moveObject = jsonObject.getAsJsonObject("move");
+        JsonObject moveObject = jsonObject.get("move").getAsJsonObject();
         JsonObject jsonStartPosition = moveObject.getAsJsonObject("startPosition");
         JsonObject jsonEndPosition = moveObject.getAsJsonObject("endPosition");
         JsonObject jsonPromotionPiece = moveObject.has("promotionPiece") ? moveObject.getAsJsonObject("promotionPiece") : null;
         ChessPiece.PieceType promotionPiece = null;
 
-        System.out.println("json object: " + jsonObject);
         System.out.println("move object: " + moveObject);
 
         if (jsonPromotionPiece != null) {

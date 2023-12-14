@@ -114,7 +114,7 @@ public class WSService {
         }
 
         // if you try to move one of the opponent's pieces, return null and handle error in Server class
-        if (game.chessGame().getBoard().getPiece(makeMoveCommand.getChessMove().getStartPosition()).getTeamColor() != playerColor) {
+        if (game.chessGame().getBoard().getPiece(makeMoveCommand.getChessMove().getStartPosition()) != null && game.chessGame().getBoard().getPiece(makeMoveCommand.getChessMove().getStartPosition()).getTeamColor() != playerColor) {
             return null;
         }
 

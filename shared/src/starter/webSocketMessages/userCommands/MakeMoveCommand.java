@@ -4,13 +4,13 @@ import chess.ChessMove;
 
 public class MakeMoveCommand extends UserGameCommand {
     private final Integer gameID;
-    private ChessMove chessMove;
+    private ChessMove move;
     private final String username;
 
-    public MakeMoveCommand(Integer gameID, ChessMove chessMove, String username, String authToken, CommandType commandType) {
+    public MakeMoveCommand(Integer gameID, ChessMove move, String username, String authToken, CommandType commandType) {
         super(authToken, commandType);
         this.gameID = gameID;
-        this.chessMove = chessMove;
+        this.move = move;
         this.username = username;
     }
 
@@ -19,11 +19,11 @@ public class MakeMoveCommand extends UserGameCommand {
     }
 
     public ChessMove getChessMove() {
-        return chessMove;
+        return move;
     }
 
-    public void setChessMove(ChessMove chessMove) {
-        this.chessMove = chessMove;
+    public void setChessMove(ChessMove move) {
+        this.move = move;
     }
 
     public String getUsername() {
